@@ -28,7 +28,8 @@
       <div class="err" id="loginErr"></div>
       <button class="btn btn-gold btn-lg" type="submit" id="loginBtn">Sign in</button>
     </form>
-    <a class="back" href="index.html">← Back to website</a>
+    <button class="theme-btn login-theme" id="themeBtnLogin" type="button" aria-label="Toggle dark mode">☾</button>
+          <a class="back" href="index.html">← Back to website</a>
   </div>
 </div>
 
@@ -43,6 +44,7 @@
       <a href="#sheet" data-view="sheet"><i>⌗</i>Data &amp; sheet</a>
     </nav>
     <div class="side-foot">
+      <button class="theme-row" id="themeBtn" type="button"><span>Dark mode</span><i class="sw"><b></b></i></button>
       <div class="conn" id="conn"><i></i><span>Checking connection…</span></div>
       <div class="user"><b id="who"></b><a href="#" id="logoutLink">Sign out</a></div>
     </div>
@@ -473,7 +475,14 @@ function boot(email){
 }
 const s=session(); if(s) boot(s.email); else $("email").focus();
 })();
+
+(function(){
+  const key="aasiya.site.theme", root=document.documentElement;
+  const apply=t=>root.setAttribute("data-theme",t);
+  apply(localStorage.getItem(key)||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
+  const flip=()=>{const t=root.getAttribute("data-theme")==="dark"?"light":"dark";localStorage.setItem(key,t);apply(t);};
+  document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
+})();
 </script>
-<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v31edd6df95cf4e85bb4c19e7a9bdbcba1788362987495" integrity="sha512-iIg7k2xntmwu6/uSb5tpc/hySgZc4eoL31yB29W6tJFo2akwjPWcEqnCEdJvGexCL0KEQwVYv5BlowfhVz26hg==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3627ca97c675e5d',t:'MTc4ODU4MjUwMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
