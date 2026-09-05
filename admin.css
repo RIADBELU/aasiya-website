@@ -224,3 +224,8 @@ html[data-theme="dark"] .btn-danger{color:#f0a49e;border-color:#6b2f2a}
 html[data-theme="dark"] .sched{background:#1a2420}
 html[data-theme="dark"] .filters button.on,html[data-theme="dark"] .seg button.on{background:#1f302c;color:var(--ink)}
 html[data-theme="dark"] .ann-item,html[data-theme="dark"] .qa-item{border-color:var(--line)}
+/* dark-mode: catch-alls for anything still light */
+html[data-theme="dark"] .rawwrap,html[data-theme="dark"] .health li,html[data-theme="dark"] .kv,html[data-theme="dark"] .ann-item,html[data-theme="dark"] .modal-box,html[data-theme="dark"] .side-menu{background:var(--card);border-color:var(--line)}
+html[data-theme="dark"] .tbl th,html[data-theme="dark"] .tbl td{border-color:var(--line)}
+html[data-theme="dark"] .tophdr,html[data-theme="dark"] .main{background:transparent}
+html[data-theme="dark"] .toast{background:var(--gold);color:var(--green-2)}
