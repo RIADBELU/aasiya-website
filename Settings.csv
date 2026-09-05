@@ -1,0 +1,30 @@
+Key,Value
+mosqueName,Aasiya Musalla
+location,"Regina, Saskatchewan"
+timezone,America/Regina
+latitude,50.4452
+longitude,-104.6189
+method,ISNA
+asrMethod,Standard
+highLatRule,AngleBased
+offsetFajr,0
+offsetDhuhr,0
+offsetAsr,0
+offsetMaghrib,0
+offsetIsha,0
+hijriOffset,0
+timesSource,aladhan
+maghribIqamahMinutes,5
+highlightHoldMinutes,10
+iqamahAlertMinutes,3
+iqamahBoxSeconds,60
+prayerDurationMinutes,8
+fajrDurationMinutes,12
+refreshMinutes,5
+nameSwapSeconds,10
+tickerSeconds,12
+tickerSpeed,60
+tickerScale,1
+footerScale,1
+showSeconds,TRUE
+burnInProtection,TRUE
