@@ -46,11 +46,11 @@ img{max-width:100%;display:block}
 
 /* ---------- top bar (Taskbar-inspired) ---------- */
 .topbar{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,var(--green-2),var(--green));border-bottom:1px solid rgba(201,165,74,.35);color:#fff}
-.topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:76px;gap:24px}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:76px;gap:32px;max-width:none;padding:0 32px}
 .brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.2px}
 .brand img{width:44px;height:auto;flex:none}
 .brand small{display:block;font-weight:500;font-size:11px;letter-spacing:.14em;opacity:.75;text-transform:uppercase}
-.nav{display:flex;align-items:center;gap:24px;font-weight:600;font-size:15px}
+.nav{display:flex;align-items:center;justify-content:center;flex:1;gap:32px;font-weight:600;font-size:15px}
 .nav a{white-space:nowrap;padding:6px 0;border-bottom:2px solid transparent;opacity:.9;transition:.2s}
 .nav a:hover{opacity:1}
 .nav a.active{color:var(--gold-2);border-bottom-color:var(--gold)}
@@ -109,8 +109,10 @@ h2{font-size:clamp(28px,3.4vw,40px);margin:0;letter-spacing:-.025em;font-weight:
 .ptable .times{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:14px}
 .ptable .times>div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .ptable .t{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-weight:700}
-.ptable .v{font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
-.ptable .v.iq{color:var(--green);font-size:24px;font-weight:800}
+.ptable .v{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+.ptable .v.iq{color:var(--green);font-size:20px;font-weight:800}
+.ptable .times>div{flex-wrap:nowrap}
+@media (min-width:900px) and (max-width:1180px){.ptable .v{font-size:15px}.ptable .v.iq{font-size:18px}.ptable .p{padding:20px 16px 18px}}
 .sunline{display:flex;gap:14px;justify-content:center;color:var(--muted);font-size:14px;margin-top:24px;flex-wrap:wrap}
 .sunline span{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:9px 16px}
 .sunline svg{width:18px;height:18px;color:var(--gold)}
