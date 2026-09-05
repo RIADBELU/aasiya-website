@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — Aasiya Musalla</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="site.css">
+<link rel="stylesheet" href="admin.css">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+</head>
+<body class="adm">
+
+<!-- ================= LOGIN ================= -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-art"></div>
+  <div class="login-panel">
+    <a class="brand" href="index.html"><img src="assets/mark.png" alt="" width="44" height="34"><span>Aasiya Musalla<small>Admin console</small></span></a>
+    <h1>Welcome back</h1>
+    <p>Sign in to manage the iqamah schedule and announcements shown on the website and the TV display.</p>
+    <form id="loginForm" autocomplete="on">
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="username" required>
+      <label for="pass">Password</label>
+      <div class="pw"><input id="pass" type="password" autocomplete="current-password" required><button type="button" id="pwToggle" aria-label="Show password">Show</button></div>
+      <div class="err" id="loginErr"></div>
+      <button class="btn btn-gold btn-lg" type="submit" id="loginBtn">Sign in</button>
+    </form>
+    <button class="theme-btn login-theme" id="themeBtnLogin" type="button" aria-label="Toggle dark mode">☾</button>
+          <a class="back" href="index.html">← Back to website</a>
+  </div>
+</div>
+
+<!-- ================= CONSOLE ================= -->
+<div class="console" id="console" hidden>
+  <aside class="side">
+    <a class="brand" href="index.html"><img src="assets/mark.png" alt="" width="44" height="34"><span>Aasiya Musalla<small>Admin</small></span></a>
+    <nav class="sidenav">
+      <a href="#overview" data-view="overview" class="active"><i>◎</i>Overview</a>
+      <a href="#iqamah" data-view="iqamah"><i>◷</i>Iqamah schedule</a>
+      <a href="#announcements" data-view="announcements"><i>▤</i>Announcements <b class="cnt" id="navAnnCount"></b></a>
+      <a href="#sheet" data-view="sheet"><i>⌗</i>Data &amp; sheet</a>
+    </nav>
+    <div class="side-foot">
+      <button class="theme-row" id="themeBtn" type="button"><span>Dark mode</span><i class="sw"><b></b></i></button>
+      <div class="conn" id="conn"><i></i><span>Checking connection…</span></div>
+      <div class="user"><b id="who"></b><a href="#" id="logoutLink">Sign out</a></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="tophdr">
+      <button class="menu-btn side-toggle" id="sideToggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <h1 id="viewTitle">Overview</h1>
+      <div class="hdr-acts">
+        <span class="synced" id="syncedAt"></span>
+        <button class="btn btn-ghost btn-sm" id="reloadBtn" type="button">↻ Reload data</button>
+        <a class="btn btn-ghost btn-sm" id="sheetLink" target="_blank" rel="noopener">Open Sheet ↗</a>
+        <a class="btn btn-gold btn-sm tvlink" href="prayerdisplay.html" target="_blank" rel="noopener">TV display ↗</a>
+      </div>
+    </header>
+
+    <div class="banner warn" id="setupBanner" hidden>
+      <b>Saving isn’t connected yet.</b> <span id="setupText">The Apps Script web app didn’t respond. Open the Apps Script editor, make sure the latest <code>AppsScript.gs</code> is pasted, then <em>Deploy → Manage deployments → ✎ → New version → Deploy</em>.</span>
+    </div>
+
+    <!-- ---------- OVERVIEW ---------- -->
+    <section class="view" data-view="overview">
+      <div class="stats">
+        <div class="stat">
+          <span class="k">Now</span>
+          <b id="ovClock">—</b>
+          <span class="s" id="ovDate">—</span>
+        </div>
+        <div class="stat">
+          <span class="k" id="ovLabel">Current prayer</span>
+          <b id="ovPrayer">—</b>
+          <span class="s" id="ovIq">—</span>
+        </div>
+        <div class="stat">
+          <span class="k">Live announcements</span>
+          <b id="ovAnn">0</b>
+          <span class="s" id="ovAnnSub">—</span>
+        </div>
+        <div class="stat">
+          <span class="k">Schedule in effect</span>
+          <b id="ovSched">—</b>
+          <span class="s" id="ovSchedSub">—</span>
+        </div>
+      </div>
+
+      <div class="cols">
+        <div class="panel">
+          <div class="panel-h"><h2>Today’s times</h2><span class="hint">Exactly what the website and TV are showing</span></div>
+          <table class="tbl" id="ovTable"><thead><tr><th>Prayer</th><th>Begins</th><th>Iqamah</th><th>Rule</th></tr></thead><tbody></tbody></table>
+          <div class="sunrow" id="ovSun"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Quick actions</h2></div>
+          <div class="qa">
+            <a href="#iqamah" class="qa-item"><i>◷</i><div><b>Change iqamah times</b><span>Edit the current schedule — changes go live within 5 minutes.</span></div></a>
+            <a href="#announcements" class="qa-item" id="qaAnn"><i>▤</i><div><b>Post an announcement</b><span>Shown on the website and scrolled across the TV ticker.</span></div></a>
+            <a href="prayerdisplay.html" target="_blank" rel="noopener" class="qa-item"><i>▣</i><div><b>Preview the TV display</b><span>Opens in a new tab — press F for full screen.</span></div></a>
+          </div>
+          <div class="panel-h" style="margin-top:22px"><h2>Recent announcements</h2></div>
+          <div id="ovAnnList" class="mini-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- IQAMAH ---------- -->
+    <section class="view" data-view="iqamah" hidden>
+      <div class="cols iq-cols">
+        <div class="panel">
+          <div class="panel-h">
+            <div><h2>Edit iqamah times</h2><p class="sub">This edits the schedule row <b>already in the Sheet</b> — it does not add a new one.</p></div>
+            <div class="seg" id="schedPick"></div>
+          </div>
+
+          <form id="iqForm" class="iqgrid">
+            <div class="iqrow head"><span>Prayer</span><span>Begins today</span><span>Iqamah</span><span>Result</span></div>
+            <!-- rows injected -->
+            <div id="iqRows"></div>
+            <div class="iqfoot">
+              <div class="iqhelp">
+                <b>How to write a time</b>
+                <span><code>5:15</code> or <code>5:15 pm</code> = fixed clock time</span>
+                <span><code>+5</code> = minutes after the adhan (Maghrib usually)</span>
+                <span><code>+10 ^5</code> = 10 min after, rounded up to the next 5</span>
+              </div>
+              <div class="iqacts">
+                <span class="msg" id="iqMsg"></span>
+                <button class="btn btn-ghost" type="button" id="iqReset">Discard changes</button>
+                <button class="btn btn-gold" type="submit" id="iqSave" disabled>Save changes</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="panel side-panel">
+          <div class="panel-h"><h2>Schedule rows</h2><span class="hint">Newest date wins</span></div>
+          <p class="sub">The display uses the row with the latest date that is <em>on or before today</em>. Most of the time you only need one row and simply edit it.</p>
+          <div id="schedList" class="sched-list"></div>
+          <details class="adv">
+            <summary>Advanced: schedule a future change</summary>
+            <p class="sub">Add a second row that takes effect from a chosen date (e.g. the first day of Ramadan). Until then the current row stays in effect.</p>
+            <form id="iqNewForm">
+              <label for="newDate">Takes effect on</label>
+              <input id="newDate" type="date" required>
+              <p class="sub" style="margin:8px 0 12px">The new row starts as a copy of the schedule you’re editing; edit it afterwards.</p>
+              <button class="btn btn-ghost btn-sm" type="submit">Add scheduled row</button>
+              <span class="msg" id="newMsg"></span>
+            </form>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- ANNOUNCEMENTS ---------- -->
+    <section class="view" data-view="announcements" hidden>
+      <div class="cols ann-cols">
+        <div class="panel">
+          <div class="panel-h"><h2 id="annFormTitle">New announcement</h2><button class="btn btn-ghost btn-sm" id="annCancelEdit" type="button" hidden>Cancel edit</button></div>
+          <form id="annForm">
+            <label for="msg">Message</label>
+            <textarea id="msg" maxlength="300" placeholder="e.g. Halaqah every Saturday after Maghrib — all welcome." required></textarea>
+            <div class="charline"><span id="charCount">0 / 300</span></div>
+            <div class="row2">
+              <div><label for="start">Show from <span class="opt">optional</span></label><input id="start" type="date"></div>
+              <div><label for="end">Show until <span class="opt">optional</span></label><input id="end" type="date"></div>
+            </div>
+            <div class="chips">
+              <button type="button" class="chip" data-days="7">1 week</button>
+              <button type="button" class="chip" data-days="14">2 weeks</button>
+              <button type="button" class="chip" data-days="30">1 month</button>
+              <button type="button" class="chip" data-days="0">No end date</button>
+            </div>
+            <div class="preview">
+              <span class="k">Preview on the TV ticker</span>
+              <div class="ticker"><div class="tk" id="tkPreview">Your message will scroll here…</div></div>
+            </div>
+            <div class="iqacts" style="margin-top:18px">
+              <span class="msg" id="annMsg"></span>
+              <button class="btn btn-gold" type="submit" id="annSave">Publish</button>
+            </div>
+          </form>
+        </div>
+        <div class="panel">
+          <div class="panel-h">
+            <h2>All announcements <span class="pill" id="countPill">0</span></h2>
+            <div class="seg small" id="annFilter"><button class="on" data-f="all">All</button><button data-f="live">Live</button><button data-f="sched">Scheduled</button><button data-f="past">Expired</button></div>
+          </div>
+          <div id="list" class="ann-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- SHEET ---------- -->
+    <section class="view" data-view="sheet" hidden>
+      <div class="cols">
+        <div class="panel">
+          <div class="panel-h"><h2>Connection health</h2></div>
+          <ul class="health" id="health"></ul>
+          <div class="panel-h" style="margin-top:22px"><h2>Where the data lives</h2></div>
+          <p class="sub">Everything on the website and TV is read from one Google Sheet. This console writes to it through a small Google Apps Script so nobody needs to edit cells by hand — but you always can.</p>
+          <div class="kv">
+            <div><span>Google Sheet</span><a id="sheetLink2" target="_blank" rel="noopener">Open in Google Sheets ↗</a></div>
+            <div><span>Iqamah tab</span><code>date, fajr, dhuhr, asr, maghrib, isha</code></div>
+            <div><span>Announcements tab</span><code>message, startDate, endDate</code></div>
+            <div><span>Settings tab</span><code>key, value</code> — display options (ticker speed, etc.)</div>
+            <div><span>Adhan times</span>AlAdhan (ISNA) for Regina — automatic, never edited</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Raw “Iqamah” tab</h2><span class="hint">read-only</span></div>
+          <div class="rawwrap"><table class="tbl raw" id="rawIq"></table></div>
+          <div class="panel-h" style="margin-top:22px"><h2>Raw “Settings” tab</h2><span class="hint">read-only</span></div>
+          <div class="rawwrap"><table class="tbl raw" id="rawSet"></table></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="site.js"></script>
+<script>
+(function(){
+"use strict";
+const A=window.Aasiya, $=id=>document.getElementById(id);
+
+/* ---- Access -------------------------------------------------------------
+   Credentials are checked against a SHA-256 hash so the password never appears
+   in the file. (A light gate for a public notice board, not bank-grade security.) */
+const ADMIN_EMAIL="riadkabashi569@gmail.com";
+const ADMIN_HASH ="c56f5d6dbe8ecb69893caf34308d84a81e9b2cf331385e79e3071fd7f7e36673";
+const SESSION_KEY="aasiya.admin.session";
+
+/* ---- Write endpoint (Google Apps Script web app; see SETUP.md Part 5) ---- */
+const WRITE_URL="https://script.google.com/macros/s/AKfycbx3pdGH5ibD_LjZMaxCjQxDH5fQMkTqsLqMixiL6Vpem5-p6BJaQQqsDMHV1Eg-TVmF/exec";
+const WRITE_SECRET="aasiya-2026";   // must match SECRET in the Apps Script
+
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const todayKey=()=>{const n=A.mosqueNow();return n.y+"-"+A.pad2(n.m)+"-"+A.pad2(n.d);};
+const fmtIq=iq=>iq.hours!=null?A.fmtTime(iq.hours):(iq.text||"—");
+
+async function sha256(s){ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+function session(){ try{ const s=JSON.parse(sessionStorage.getItem(SESSION_KEY)||"null"); return s&&s.email===ADMIN_EMAIL&&s.exp>Date.now()?s:null; }catch(e){return null;} }
+
+$("pwToggle").onclick=()=>{ const p=$("pass"); const show=p.type==="password"; p.type=show?"text":"password"; $("pwToggle").textContent=show?"Hide":"Show"; };
+$("loginForm").addEventListener("submit",async e=>{
+  e.preventDefault(); $("loginErr").textContent="";
+  const email=$("email").value.trim().toLowerCase(), pass=$("pass").value;
+  if(!crypto.subtle){ $("loginErr").textContent="Open this page over https:// or localhost to sign in."; return; }
+  $("loginBtn").disabled=true;
+  if(email===ADMIN_EMAIL && await sha256(pass)===ADMIN_HASH){
+    sessionStorage.setItem(SESSION_KEY,JSON.stringify({email,exp:Date.now()+8*3600*1000}));
+    $("pass").value=""; boot(email);
+  }else{ $("loginErr").textContent="Incorrect email or password."; $("pass").select(); $("loginBtn").disabled=false; }
+});
+$("logoutLink").onclick=e=>{ e.preventDefault(); sessionStorage.removeItem(SESSION_KEY); location.hash=""; location.reload(); };
+
+/* ---- Toast ---- */
+let toastT=null;
+function toast(msg,kind){ const t=$("toast"); t.textContent=msg; t.className="toast "+(kind||""); t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,3600); }
+
+/* ---- Write ---- */
+let WRITE_OK=null; // null unknown, true, false
+async function write(action,payload){
+  const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({secret:WRITE_SECRET,action},payload||{}))});
+  const txt=await r.text(); let j={}; try{ j=JSON.parse(txt); }catch(e){}
+  if(!r.ok||!j.ok){
+    if(/Script function not found/i.test(txt)) throw new Error("The Apps Script deployment is missing doPost — paste the latest AppsScript.gs and deploy a New version.");
+    throw new Error(j.error||"Save failed ("+r.status+")");
+  }
+  return j;
+}
+async function pingWriter(){
+  try{ const j=await write("ping"); WRITE_OK=true; if(!j.version||j.version<2){ WRITE_OK=false; $("setupText").innerHTML="The Apps Script is an <b>old version</b> without iqamah editing. Paste the latest <code>AppsScript.gs</code> and deploy a <em>New version</em>."; } }
+  catch(err){ WRITE_OK=false; $("setupText").innerHTML=esc(err.message)+" Until then you can still edit the Sheet directly with “Open Sheet”."; }
+  $("setupBanner").hidden=WRITE_OK===true;
+  paintConn();
+}
+function paintConn(){
+  const c=$("conn"), s=A.SHEET();
+  const readOk=!!s.live, ok=readOk&&WRITE_OK===true;
+  c.className="conn "+(ok?"ok":readOk?"warn":"bad");
+  c.querySelector("span").textContent= ok?"Connected · read & write": readOk?"Connected · read-only": "Offline · cached data";
+}
+
+/* ---- Views ---- */
+const TITLES={overview:"Overview",iqamah:"Iqamah schedule",announcements:"Announcements",sheet:"Data & sheet"};
+function showView(v){
+  if(!TITLES[v]) v="overview";
+  document.querySelectorAll(".view").forEach(s=>s.hidden=s.dataset.view!==v);
+  document.querySelectorAll(".sidenav a").forEach(a=>a.classList.toggle("active",a.dataset.view===v));
+  $("viewTitle").textContent=TITLES[v]; document.body.classList.remove("side-open");
+  window.scrollTo({top:0});
+}
+window.addEventListener("hashchange",()=>showView(location.hash.slice(1)));
+$("sideToggle").onclick=()=>document.body.classList.toggle("side-open");
+
+/* ---- Data ---- */
+let DAY=null, TODAY=null, ROWS=[], SCHED=[], CUR_SCHED=0, DIRTY=false, EDIT=null, FILTER="all";
+async function loadAll(){
+  const n=A.mosqueNow();
+  try{ await A.fetchSheet(); }catch(e){ toast("Could not reach the Google Sheet — showing cached data","bad"); }
+  try{ await A.fetchAdhan(n.y,n.m); }catch(e){}
+  TODAY=A.timesFor(n); DAY=A.buildDay(n);
+  ROWS=(A.SHEET().announcements||[]).map((r,i)=>({message:r[0]||"",start:r[1]||"",end:r[2]||"",i}));
+  SCHED=(A.SHEET().iqamah||[]).map((r,i)=>({row:i+2,date:String(r[0]||""),key:A.parseDateKey(r[0]),vals:[1,2,3,4,5].map(k=>String(r[k]==null?"":r[k]))}));
+  // the schedule in effect = same rule as the display
+  const tk=n.y*10000+n.m*100+n.d; let best=-1,bk=-1;
+  SCHED.forEach((s,i)=>{ if(s.key!==null&&s.key<=tk&&s.key>=bk){bk=s.key;best=i;} });
+  if(best<0&&SCHED.length) best=0;
+  if(!DIRTY) CUR_SCHED=Math.max(0,best);
+  SCHED.forEach((s,i)=>s.inEffect=i===best);
+  $("syncedAt").textContent="Synced "+new Date().toLocaleTimeString("en-CA",{timeZone:"America/Regina",hour:"numeric",minute:"2-digit"});
+  renderOverview(); renderIqamah(); renderAnn(); renderSheet(); paintConn();
+}
+$("reloadBtn").onclick=()=>{ if(DIRTY&&!confirm("You have unsaved iqamah changes. Reload anyway?")) return; DIRTY=false; loadAll().then(()=>toast("Data reloaded")); };
+
+/* ---- Overview ---- */
+function renderOverview(){
+  const n=A.mosqueNow();
+  $("ovDate").textContent=new Date().toLocaleDateString("en-CA",{timeZone:"America/Regina",weekday:"long",month:"long",day:"numeric"})+(DAY?" · "+A.hijriText(DAY.hijri):"");
+  const live=A.activeAnnouncements(n); $("ovAnn").textContent=live.length; $("navAnnCount").textContent=live.length||"";
+  $("ovAnnSub").textContent=ROWS.length? (ROWS.length-live.length)+" scheduled or expired":"Nothing posted yet";
+  const eff=SCHED.find(s=>s.inEffect);
+  $("ovSched").textContent=eff?(eff.date||"Undated"):"—";
+  $("ovSchedSub").textContent=SCHED.length>1?SCHED.length+" rows in the Sheet · latest ≤ today wins":"Single schedule row";
+  const tb=$("ovTable").querySelector("tbody");
+  if(DAY){
+    const fi=A.focusIndex(DAY,n.hours);
+    tb.innerHTML=DAY.prayers.map((p,i)=>'<tr'+(i===fi?' class="cur"':'')+'><td><b>'+p.label+'</b></td><td>'+A.fmtTime(p.begin)+'</td><td class="iq">'+(p.iq!=null?A.fmtTime(p.iq):esc(p.iqText||"—"))+'</td><td class="rule"><code>'+esc((eff&&eff.vals[i])||(p.key==="maghrib"?"+"+Math.round(A.CFG.maghribIqamahMinutes):"+10"))+'</code></td></tr>').join("");
+    $("ovSun").innerHTML="Sunrise <b>"+A.fmtTime(DAY.sunrise)+"</b> · Sunset <b>"+A.fmtTime(DAY.sunset)+"</b>";
+  }else{ tb.innerHTML='<tr><td colspan="4" class="muted">Prayer times unavailable (offline?)</td></tr>'; }
+  $("ovAnnList").innerHTML=ROWS.length? ROWS.slice(-4).reverse().map(r=>{ const st=A.announcementState({start:A.parseDateKey(r.start),end:A.parseDateKey(r.end)},n); return '<div class="mini"><span class="pill '+st+'">'+({live:"Live",sched:"Scheduled",past:"Expired"})[st]+'</span><span>'+esc(r.message)+'</span></div>'; }).join("") : '<div class="empty">No announcements yet.</div>';
+}
+function tickOverview(){
+  const n=A.mosqueNow();
+  $("ovClock").textContent=A.fmtTime(n.hours).replace(/:(\d\d) /,":$1 ");
+  if(!DAY) return;
+  const fi=A.focusIndex(DAY,n.hours); const cur=fi>=0?DAY.prayers[fi]:DAY.prayers[4];
+  $("ovLabel").textContent=fi>=0&&n.hours<cur.begin?"Upcoming prayer":"Current prayer";
+  $("ovPrayer").textContent=cur.label;
+  if(cur.iq!=null&&n.hours<cur.iq){ const s=Math.max(0,Math.round((cur.iq-n.hours)*3600)); $("ovIq").textContent="Iqamah "+A.fmtTime(cur.iq)+" · in "+Math.floor(s/60)+" min"; }
+  else $("ovIq").textContent="Iqamah "+(cur.iq!=null?A.fmtTime(cur.iq):(cur.iqText||"—"));
+  const trs=$("ovTable").querySelectorAll("tbody tr"); trs.forEach((tr,i)=>tr.classList.toggle("cur",i===fi));
+}
+
+/* ---- Iqamah editor ---- */
+function renderIqamah(){
+  // schedule picker
+  $("schedPick").innerHTML=SCHED.map((s,i)=>'<button type="button" class="'+(i===CUR_SCHED?"on":"")+'" data-i="'+i+'">'+esc(s.date||"Undated")+(s.inEffect?' <em>in effect</em>':'')+'</button>').join("");
+  $("schedPick").querySelectorAll("button").forEach(b=>b.onclick=()=>{ if(DIRTY&&!confirm("Discard unsaved changes?")) return; DIRTY=false; CUR_SCHED=+b.dataset.i; renderIqamah(); });
+  $("schedPick").style.display=SCHED.length>1?"":"none";
+  const s=SCHED[CUR_SCHED];
+  $("iqRows").innerHTML=A.PRAYERS.map((p,i)=>{
+    const begin=TODAY?TODAY[p.key]:null;
+    return '<div class="iqrow"><span class="pn"><b>'+p.label+'</b><small>'+p.ar+'</small></span>'+
+      '<span class="begin">'+(begin!=null?A.fmtTime(begin):"—")+'</span>'+
+      '<span><input class="iqin" data-i="'+i+'" value="'+esc(s?s.vals[i]:"")+'" placeholder="'+(p.key==="maghrib"?"+5":"e.g. 5:15")+'" autocomplete="off" spellcheck="false"></span>'+
+      '<span class="res" data-res="'+i+'">—</span></div>';
+  }).join("");
+  $("iqRows").querySelectorAll(".iqin").forEach(inp=>{ inp.addEventListener("input",()=>{ DIRTY=true; $("iqSave").disabled=false; $("iqMsg").textContent=""; previewRow(+inp.dataset.i); }); previewRow(+inp.dataset.i); });
+  $("iqSave").disabled=!DIRTY;
+  // list
+  $("schedList").innerHTML=SCHED.length? SCHED.map((x,i)=>'<div class="sched'+(x.inEffect?" eff":"")+(i===CUR_SCHED?" sel":"")+'"><div><b>'+esc(x.date||"Undated")+'</b>'+(x.inEffect?'<span class="pill live">In effect</span>':(x.key&&x.key>+todayKey().replace(/-/g,"")?'<span class="pill sched">Upcoming</span>':'<span class="pill past">Superseded</span>'))+'<div class="vals">'+x.vals.map(v=>esc(v||"—")).join(" · ")+'</div></div>'+
+      '<div class="acts"><button class="btn btn-ghost btn-sm" data-edit="'+i+'" type="button">Edit</button>'+(SCHED.length>1?'<button class="btn btn-danger btn-sm" data-delsched="'+i+'" type="button">Delete</button>':'')+'</div></div>').join("")
+    : '<div class="empty">No schedule rows found in the Sheet.</div>';
+  $("schedList").querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>{ if(DIRTY&&!confirm("Discard unsaved changes?")) return; DIRTY=false; CUR_SCHED=+b.dataset.edit; renderIqamah(); $("iqForm").scrollIntoView({behavior:"smooth",block:"start"}); });
+  $("schedList").querySelectorAll("[data-delsched]").forEach(b=>b.onclick=()=>delSched(+b.dataset.delsched));
+  const nd=$("newDate"); if(!nd.value) nd.min=todayKey();
+}
+function previewRow(i){
+  const p=A.PRAYERS[i], inp=$("iqRows").querySelector('.iqin[data-i="'+i+'"]'), res=$("iqRows").querySelector('[data-res="'+i+'"]');
+  const begin=TODAY?TODAY[p.key]:null; const v=inp.value.trim();
+  const dflt=p.key==="maghrib"?"+"+Math.round(A.CFG.maghribIqamahMinutes):"+10";
+  const iq=A.resolveIqamah(v,begin,dflt);
+  let cls="", text;
+  if(!v){ text=fmtIq(iq)+" <small>default "+dflt+"</small>"; cls="dim"; }
+  else if(iq.hours==null){ text=esc(iq.text)+" <small>shown as text</small>"; cls="warn"; }
+  else{ text=A.fmtTime(iq.hours); if(begin!=null&&iq.hours<begin-1e-9){ text+=" <small>before adhan!</small>"; cls="bad"; } }
+  res.className="res "+cls; res.innerHTML=text; inp.classList.toggle("bad",cls==="bad");
+}
+$("iqReset").onclick=()=>{ DIRTY=false; renderIqamah(); $("iqMsg").textContent=""; };
+$("iqForm").addEventListener("submit",async e=>{
+  e.preventDefault(); const s=SCHED[CUR_SCHED]; if(!s){ toast("No schedule row to edit","bad"); return; }
+  const vals=[...$("iqRows").querySelectorAll(".iqin")].map(i=>i.value.trim());
+  const payload={row:s.row,originalDate:s.date,date:s.date}; A.PRAYERS.forEach((p,i)=>payload[p.key]=vals[i]);
+  $("iqSave").disabled=true; $("iqMsg").textContent="Saving…"; $("iqMsg").className="msg";
+  try{ await write("iqamah_set",payload); DIRTY=false; $("iqMsg").textContent=""; toast("Iqamah times saved — live on the website and TV within 5 minutes","ok"); await loadAll(); }
+  catch(err){ $("iqMsg").textContent=err.message; $("iqMsg").className="msg bad"; $("iqSave").disabled=false; }
+});
+$("iqNewForm").addEventListener("submit",async e=>{
+  e.preventDefault(); const d=$("newDate").value; if(!d) return; const src=SCHED[CUR_SCHED]||{vals:["","","","",""]};
+  const payload={date:d}; A.PRAYERS.forEach((p,i)=>payload[p.key]=src.vals[i]);
+  $("newMsg").textContent="Adding…"; $("newMsg").className="msg";
+  try{ const j=await write("iqamah_add",payload); $("newMsg").textContent=""; toast(j.merged?"That date already existed — it was updated":"Scheduled row added","ok"); DIRTY=false; await loadAll(); const idx=SCHED.findIndex(x=>x.row===j.row); if(idx>=0){ CUR_SCHED=idx; renderIqamah(); } $("newDate").value=""; }
+  catch(err){ $("newMsg").textContent=err.message; $("newMsg").className="msg bad"; }
+});
+async function delSched(i){
+  const s=SCHED[i]; if(!s||!confirm("Delete the schedule row dated "+(s.date||"Undated")+"?\n\nThis cannot be undone.")) return;
+  try{ await write("iqamah_del",{row:s.row,date:s.date}); toast("Schedule row deleted","ok"); DIRTY=false; CUR_SCHED=0; await loadAll(); }catch(err){ toast(err.message,"bad"); }
+}
+
+/* ---- Announcements ---- */
+function stateOf(r){ return A.announcementState({start:A.parseDateKey(r.start),end:A.parseDateKey(r.end)},A.mosqueNow()); }
+function renderAnn(){
+  const n=A.mosqueNow(); $("countPill").textContent=ROWS.length;
+  const list=ROWS.filter(r=>FILTER==="all"||stateOf(r)===FILTER).slice().reverse();
+  $("list").innerHTML=list.length? list.map(r=>{ const st=stateOf(r); const lbl={live:"Live",sched:"Scheduled",past:"Expired"}[st];
+    return '<div class="arow '+(EDIT===r.i?"editing":"")+'"><div class="body"><div class="msg">'+esc(r.message)+'</div>'+
+      '<div class="dates"><span class="pill '+st+'">'+lbl+'</span>'+(r.start?"From "+esc(r.start):"From now")+(r.end?" · until "+esc(r.end):" · no end date")+'</div></div>'+
+      '<div class="acts"><button class="btn btn-ghost btn-sm" data-edit="'+r.i+'" type="button">Edit</button><button class="btn btn-danger btn-sm" data-del="'+r.i+'" type="button">Remove</button></div></div>'; }).join("")
+    : '<div class="empty">'+(ROWS.length?"Nothing matches this filter.":"No announcements yet — post your first one on the left.")+'</div>';
+  $("list").querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>removeAnn(+b.dataset.del));
+  $("list").querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>editAnn(+b.dataset.edit));
+}
+$("annFilter").querySelectorAll("button").forEach(b=>b.onclick=()=>{ FILTER=b.dataset.f; $("annFilter").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); renderAnn(); });
+function editAnn(i){ const r=ROWS.find(x=>x.i===i); if(!r) return; EDIT=i; $("msg").value=r.message; $("start").value=toISO(r.start); $("end").value=toISO(r.end); $("annFormTitle").textContent="Edit announcement"; $("annSave").textContent="Save changes"; $("annCancelEdit").hidden=false; updPreview(); renderAnn(); $("annForm").scrollIntoView({behavior:"smooth",block:"start"}); $("msg").focus(); }
+function cancelEdit(){ EDIT=null; $("annForm").reset(); $("annFormTitle").textContent="New announcement"; $("annSave").textContent="Publish"; $("annCancelEdit").hidden=true; updPreview(); renderAnn(); }
+$("annCancelEdit").onclick=cancelEdit;
+function toISO(s){ const k=A.parseDateKey(s); if(k===null) return ""; return Math.floor(k/10000)+"-"+A.pad2(Math.floor(k/100)%100)+"-"+A.pad2(k%100); }
+function updPreview(){ const v=$("msg").value.trim(); $("tkPreview").textContent=v||"Your message will scroll here…"; $("charCount").textContent=$("msg").value.length+" / 300"; }
+$("msg").addEventListener("input",updPreview);
+document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{ const d=+c.dataset.days; if(!d){ $("end").value=""; return; } const base=$("start").value?new Date($("start").value+"T12:00:00"):new Date(); base.setDate(base.getDate()+d); $("end").value=base.toISOString().slice(0,10); });
+$("annForm").addEventListener("submit",async e=>{
+  e.preventDefault(); const out=$("annMsg"); out.className="msg"; out.textContent="";
+  const message=$("msg").value.trim(), start=$("start").value, end=$("end").value;
+  if(start&&end&&end<start){ out.className="msg bad"; out.textContent="“Until” must be after “From”."; return; }
+  $("annSave").disabled=true; out.textContent=EDIT!==null?"Saving…":"Publishing…";
+  try{
+    if(EDIT!==null){ const r=ROWS.find(x=>x.i===EDIT); await write("update",{row:r.i+2,original:r.message,message,start,end}); toast("Announcement updated","ok"); cancelEdit(); }
+    else{ await write("add",{message,start,end}); toast("Published — it will appear on the website and TV within 5 minutes","ok"); $("annForm").reset(); updPreview(); }
+    out.textContent=""; await loadAll();
+  }catch(err){ out.className="msg bad"; out.textContent=err.message; }
+  $("annSave").disabled=false;
+});
+async function removeAnn(i){
+  const r=ROWS.find(x=>x.i===i); if(!r||!confirm("Remove this announcement?\n\n"+r.message)) return;
+  try{ await write("delete",{row:i+2,message:r.message}); toast("Announcement removed","ok"); if(EDIT===i) cancelEdit(); await loadAll(); }
+  catch(err){ toast(err.message,"bad"); }
+}
+
+/* ---- Sheet / health ---- */
+function renderSheet(){
+  const s=A.SHEET();
+  const items=[
+    ["Google Sheet (read)", s.live, s.live?"Reading live through the Sheets API":"Using the last cached copy"],
+    ["Apps Script (write)", WRITE_OK, WRITE_OK?"Saving from this console works":WRITE_OK===false?"Not reachable or outdated — see the banner above":"Checking…"],
+    ["Adhan times (AlAdhan)", !!TODAY, TODAY?"Loaded for this month":"Not loaded"],
+    ["Iqamah tab", (s.iqamah||[]).length>0, (s.iqamah||[]).length+" schedule row(s)"],
+    ["Announcements tab", true, (s.announcements||[]).length+" row(s)"],
+    ["Settings tab", true, (s.settings||[]).length+" key(s)"]];
+  $("health").innerHTML=items.map(([k,ok,d])=>'<li class="'+(ok===true?"ok":ok===false?"bad":"")+'"><i></i><div><b>'+k+'</b><span>'+esc(d)+'</span></div></li>').join("");
+  const grid=(rows,head)=>'<thead><tr>'+head.map(h=>'<th>'+h+'</th>').join("")+'</tr></thead><tbody>'+(rows.length?rows.map(r=>'<tr>'+head.map((_,i)=>'<td>'+esc(r[i]||"")+'</td>').join("")+'</tr>').join(""):'<tr><td colspan="'+head.length+'" class="muted">empty</td></tr>')+'</tbody>';
+  $("rawIq").innerHTML=grid(s.iqamah||[],["date","fajr","dhuhr","asr","maghrib","isha"]);
+  $("rawSet").innerHTML=grid(s.settings||[],["key","value"]);
+}
+
+/* ---- Boot ---- */
+function boot(email){
+  $("loginScreen").hidden=true; $("console").hidden=false; document.body.classList.add("in");
+  $("who").textContent=email;
+  $("sheetLink").href=$("sheetLink2").href="https://docs.google.com/spreadsheets/d/"+A.SHEET_ID+"/edit";
+  showView(location.hash.slice(1));
+  loadAll(); pingWriter();
+  setInterval(tickOverview,1000); setInterval(()=>{ if(!DIRTY&&EDIT===null) loadAll(); },5*60*1000);
+  window.addEventListener("beforeunload",e=>{ if(DIRTY){ e.preventDefault(); e.returnValue=""; } });
+}
+const s=session(); if(s) boot(s.email); else $("email").focus();
+})();
+
+(function(){
+  const key="aasiya.site.theme", root=document.documentElement;
+  const apply=t=>root.setAttribute("data-theme",t);
+  apply(localStorage.getItem(key)||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
+  const flip=()=>{const t=root.getAttribute("data-theme")==="dark"?"light":"dark";localStorage.setItem(key,t);apply(t);};
+  document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
+})();
+</script>
+</body>
+</html>
