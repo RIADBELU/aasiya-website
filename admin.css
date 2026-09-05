@@ -183,3 +183,44 @@ body.adm .brand{color:#fff}
   .ann-list .arow{grid-template-columns:1fr}
   .kv>div{grid-template-columns:1fr}
 }
+
+
+/* ---------- theme toggle ---------- */
+.theme-row{display:flex;align-items:center;justify-content:space-between;width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff;font:inherit;font-size:13px;font-weight:600;padding:9px 12px;border-radius:10px;cursor:pointer;margin-bottom:10px}
+.theme-row .sw{position:relative;width:34px;height:20px;border-radius:99px;background:rgba(255,255,255,.2);transition:.2s;flex:none}
+.theme-row .sw b{position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.2s}
+html[data-theme="dark"] .theme-row .sw{background:var(--gold)}
+html[data-theme="dark"] .theme-row .sw b{left:17px;background:var(--green-2)}
+.login-theme{position:absolute;top:18px;right:18px;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:16px;cursor:pointer}
+.login-panel{position:relative}
+
+/* ---------- dark mode ---------- */
+html[data-theme="dark"]{
+  --paper:#0d1716; --card:#132321; --line:#243936; --ink:#eef2ef; --muted:#9db0aa;
+  --green:#1a5a52; --green-2:#0a1513; --green-3:#1f6b62; color-scheme:dark;
+}
+html[data-theme="dark"] body.adm{background:#0b1312;color:var(--ink)}
+html[data-theme="dark"] .login-panel{background:var(--card)}
+html[data-theme="dark"] .login-panel h1,html[data-theme="dark"] .login-panel .brand{color:var(--ink)}
+html[data-theme="dark"] .side{background:linear-gradient(180deg,#0a1513,#0f1f1c)}
+html[data-theme="dark"] .panel,html[data-theme="dark"] .stat,html[data-theme="dark"] .seg button.on{background:var(--card);box-shadow:none}
+html[data-theme="dark"] .tophdr h1,html[data-theme="dark"] .panel h2,html[data-theme="dark"] .panel h3,html[data-theme="dark"] .stat b,html[data-theme="dark"] .tbl td.iq,html[data-theme="dark"] .qa-item i,html[data-theme="dark"] .side-toggle,html[data-theme="dark"] .pw button{color:var(--ink)}
+html[data-theme="dark"] .stat b,html[data-theme="dark"] .tbl td.iq{color:var(--gold-2)}
+html[data-theme="dark"] .tbl tr.cur td{background:#1a2420}
+html[data-theme="dark"] .qa-item:hover,html[data-theme="dark"] .chip:hover{background:#1a2a26}
+html[data-theme="dark"] .qa-item i,html[data-theme="dark"] .chip,html[data-theme="dark"] .seg,html[data-theme="dark"] .tbl code,html[data-theme="dark"] .iqhelp code,html[data-theme="dark"] .kv code{background:#0f1c1a;color:var(--ink)}
+html[data-theme="dark"] input,html[data-theme="dark"] textarea,html[data-theme="dark"] select{background:#0f1c1a;color:var(--ink);border-color:var(--line)}
+html[data-theme="dark"] .banner.warn{background:#2a2410;border-color:#5a4a1a;color:#e9d7a0}
+html[data-theme="dark"] .banner code{background:#0f1c1a}
+html[data-theme="dark"] .btn-ghost{color:var(--ink);border-color:var(--line)}
+html[data-theme="dark"] .iqin{color:var(--gold-2)}
+html[data-theme="dark"] .side-toggle{color:var(--ink)}
+html[data-theme="dark"] .btn-ghost:hover{background:#1a2a26}
+html[data-theme="dark"] .toast{background:var(--gold);color:var(--green-2)}
+html[data-theme="dark"] .panel-h h2,html[data-theme="dark"] .qa-item b,html[data-theme="dark"] .iqrow .pn b,html[data-theme="dark"] .sched b,html[data-theme="dark"] .health li b,html[data-theme="dark"] .chip,html[data-theme="dark"] .seg button{color:var(--ink)}
+html[data-theme="dark"] .res,html[data-theme="dark"] .adv summary,html[data-theme="dark"] .kv a,html[data-theme="dark"] .pw button{color:var(--gold-2)}
+html[data-theme="dark"] .btn-ghost,html[data-theme="dark"] .btn-sm.btn-ghost{color:var(--ink);border-color:#3a524d}
+html[data-theme="dark"] .btn-danger{color:#f0a49e;border-color:#6b2f2a}
+html[data-theme="dark"] .sched{background:#1a2420}
+html[data-theme="dark"] .filters button.on,html[data-theme="dark"] .seg button.on{background:#1f302c;color:var(--ink)}
+html[data-theme="dark"] .ann-item,html[data-theme="dark"] .qa-item{border-color:var(--line)}
