@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aasiya Musalla — Prayer Times</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="assets/sfpro.css">
+<link rel="stylesheet" href="assets/technology.css?v=2">
+<style>
+/* ===== Current Aasiya display — replica of the minaret / 7-segment board, fed by the Google Sheet ===== */
+:root{
+  --frame:#0d6a64;        /* outer teal frame */
+  --panel:#0f4744;        /* dark inset panels */
+  --panel-2:#0f4441;
+  --edge:rgba(255,255,255,.10);
+  --gold:#e4c25a; --gold-2:#f3dc85;
+  --txt:#e6e6ff; --sub:#d5e0dd;
+  --red:#ff4a3a;
+  --font:"SF Pro Display","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --u:1vmin;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#000;overflow:hidden}
+body{font-family:var(--font);color:var(--txt);font-weight:800;-webkit-font-smoothing:antialiased;
+  text-shadow:0 0 .6vmin rgba(150,150,255,.35),0 .25vmin .5vmin rgba(0,0,0,.65)}
+.frame{position:fixed;inset:0;background:var(--frame);padding:1.4vmin;display:flex;flex-direction:column;gap:1.2vmin}
+
+/* ---- header ---- */
+.head{position:relative;overflow:hidden;background:linear-gradient(180deg,#144f4a,#0f403d);border:.2vmin solid var(--edge);border-radius:1.6vmin;text-align:center;
+  padding:3.2vmin 2vmin 3.8vmin;box-shadow:inset 0 0 0 .1vmin rgba(255,255,255,.05),0 .4vmin 1.4vmin rgba(0,0,0,.35)}
+.bism{font-family:"Amiri","Scheherazade New","Noto Naskh Arabic","Traditional Arabic","Geeza Pro",serif;font-weight:400;font-size:4.8vmin;line-height:1.2;direction:rtl;margin-top:1.2vmin}
+.mname{font-size:5vmin;letter-spacing:.02em;margin-top:1.6vmin;font-weight:900;line-height:1}
+.seg,.row span:nth-child(2),.row span:nth-child(3){font-family:"Technology",monospace;font-weight:400;letter-spacing:.03em;-webkit-text-stroke:0;paint-order:stroke fill}
+.seg{font-size:1.15em}
+.clock{-webkit-text-stroke:.4vmin currentColor;font-weight:700}
+.ap{font-family:"Technology",monospace;font-size:1em;margin-left:.3em}
+.minaret{position:absolute;top:1.2vmin;bottom:0;height:calc(100% - 1.2vmin);width:auto;max-width:12vmin;object-fit:contain;object-position:bottom;opacity:1;filter:drop-shadow(0 .3vmin .5vmin rgba(0,0,0,.5))}
+.minaret.l{left:1.6vmin}.minaret.r{right:1.6vmin}
+.head .in{padding:0 13vmin}
+.dates{margin-top:1.6vmin;font-size:2.8vmin;line-height:1.2;font-weight:800}
+.clock{font-size:12.5vmin;line-height:1;margin-top:2.4vmin;margin-bottom:1vmin;font-family:"Technology",monospace;font-weight:700;letter-spacing:.04em;text-shadow:0 0 1.2vmin rgba(180,180,255,.35),0 .2vmin .4vmin rgba(0,0,0,.6)}
+
+/* ---- info strip ---- */
+.strip{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--panel);border:.2vmin solid var(--edge);border-radius:2.2vmin;box-shadow:0 .4vmin 1.4vmin rgba(0,0,0,.3);overflow:hidden}
+.tile{background:var(--panel);border:.2vmin solid var(--edge);border-radius:1.4vmin;text-align:center;padding:1.8vmin 1vmin;
+  box-shadow:0 .4vmin 1.4vmin rgba(0,0,0,.3)}
+.tile .k{font-size:2.2vmin;letter-spacing:.02em;font-weight:800;opacity:.9}
+.tile .v{font-size:3.6vmin;line-height:1.15;margin-top:.4vmin;font-weight:900;font-variant-numeric:tabular-nums}
+
+/* ---- table ---- */
+.table{flex:1;display:flex;flex-direction:column;min-height:0;border-radius:1.6vmin;overflow:hidden;
+  border:.2vmin solid var(--edge);box-shadow:0 .4vmin 1.4vmin rgba(0,0,0,.35)}
+.thead{display:grid;grid-template-columns:.85fr 1.15fr 1fr;background:linear-gradient(180deg,var(--gold-2),var(--gold) 55%,#d4ae44);color:#111;
+  text-shadow:none;font-size:3vmin;letter-spacing:.16em;font-weight:700;padding:1.3vmin 3vmin;align-items:center}
+.thead span:nth-child(2){text-align:center}.thead span:nth-child(3){text-align:right;padding-right:2vmin}
+.rows{flex:1;display:flex;flex-direction:column;background:var(--panel-2);min-height:0}
+.row{flex:1;display:grid;grid-template-columns:.85fr 1.15fr 1fr;align-items:center;padding:0 2.4vmin;font-size:4.6vmin;font-weight:900;
+  --segsize:6.4vmin;
+  border-bottom:.25vmin solid rgba(255,255,255,.12);font-variant-numeric:tabular-nums;position:relative;min-height:0}
+.row:last-child{border-bottom:0}
+.row span:nth-child(2){text-align:center}.row span:nth-child(3){text-align:right;padding-right:1vmin}.row span:nth-child(2),.row span:nth-child(3){font-family:"Technology",monospace;font-weight:400;font-size:var(--segsize);letter-spacing:.02em;white-space:nowrap}
+.row .nm{position:relative;line-height:1}
+.row .nm small{display:block;font-size:1.7vmin;font-weight:600;opacity:.75;margin-top:.5vmin;letter-spacing:.02em}
+.row.passed .iq,.row.maghrib .iq{color:#ff5a4a!important}
+.row.next{background:linear-gradient(180deg,#f7f7ff,#e6e6f5);color:#25255a;text-shadow:none;font-weight:600;
+  margin:0;border-radius:0;border-left:1vmin solid var(--gold);box-shadow:0 .6vmin 1.6vmin rgba(0,0,0,.35);border-bottom:0}
+.row.next .nm{font-weight:400;font-size:5vmin;letter-spacing:.01em}.row.next .nm small{color:#1a6b64;opacity:1;font-weight:700}
+.row.next .iq{color:#25255a}.row.next.maghrib .iq{color:var(--red)}
+
+/* ---- ticker ---- */
+.ticker{background:var(--panel);border:.2vmin solid var(--edge);border-radius:1.4vmin;padding:1.6vmin 0;overflow:hidden;
+  font-size:2.9vmin;font-weight:800;white-space:nowrap;box-shadow:0 .4vmin 1.4vmin rgba(0,0,0,.3)}
+.ticker .track{display:inline-block;padding-left:100%;animation:scroll var(--tk,40s) linear infinite}
+.ticker .track i{font-style:normal;padding:0 6vmin;color:var(--gold-2)}
+@keyframes scroll{to{transform:translateX(-100%)}}
+
+/* ---- landscape ---- */
+@media (orientation:landscape){
+  :root{--u:1vh}
+  .frame{display:grid;grid-template-columns:34vw 1fr;grid-template-rows:1fr auto;gap:1.2vmin}
+  .left{display:flex;flex-direction:column;gap:1.2vmin;min-height:0}
+  .head{flex:1;display:flex;flex-direction:column;justify-content:center}
+  .strip{grid-template-columns:1fr}
+  .tile{border-left:0;border-top:.25vmin solid rgba(255,255,255,.14)}.tile:first-child{border-top:0}
+  .table{grid-column:2;grid-row:1}
+  .ticker{grid-column:1/-1}
+  .row{font-size:5.4vmin}.thead{font-size:3vmin}
+}
+/* back-to-website corner tab (same behaviour as the main display) */
+.back{position:fixed;left:0;top:0;z-index:20;padding:1.2vmin 1.8vmin;font-size:2vmin;font-weight:700;color:#fff;background:rgba(0,0,0,.55);
+  border-radius:0 0 1.2vmin 0;opacity:0;transform:translateY(-100%);transition:.25s;text-decoration:none;text-shadow:none}
+.back.show,.back:hover{opacity:1;transform:none}
+.hot{position:fixed;left:0;top:0;width:12vmin;height:8vmin;z-index:19}
+.hot:hover+.back{opacity:1;transform:none}
+
+/* ====== Adhan/Iqamah status box (ported from the main display) ====== */
+#iqScrim{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(3,14,12,.55);
+  backdrop-filter:blur(1.5vmin) saturate(.85);-webkit-backdrop-filter:blur(1.5vmin) saturate(.85);animation:scrimIn .45s ease both}
+#iqScrim.on{display:flex}#iqScrim.out{animation:scrimOut .5s ease both}
+@keyframes scrimIn{from{opacity:0}to{opacity:1}}@keyframes scrimOut{from{opacity:1}to{opacity:0}}
+#iqBox{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.9vmin;max-width:88vw;padding:4.2vmin min(6vmin,6vw);
+  border-radius:2vmin;background:linear-gradient(165deg,rgba(19,58,50,.97),rgba(6,26,23,.97));border:1px solid rgba(227,189,118,.55);
+  box-shadow:0 2.4vmin 7vmin rgba(0,0,0,.62),0 0 5vmin rgba(227,189,118,.14) inset;animation:boxIn .5s cubic-bezier(.2,.9,.3,1.2) both;text-shadow:none}
+@keyframes boxIn{from{opacity:0;transform:translateY(2.2vmin) scale(.94)}to{opacity:1;transform:none}}
+#iqBox .kick{font-size:1.5vmin;letter-spacing:.32em;text-transform:uppercase;color:rgba(255,255,255,.68);font-weight:600}
+#iqBox .headline{font-size:min(6.4vmin,8.6vw);font-weight:800;line-height:1;letter-spacing:.02em;color:var(--gold-2);white-space:nowrap;text-shadow:0 .3vmin 2vmin rgba(0,0,0,.5)}
+#iqBox .ar{font-size:2.6vmin;font-weight:500;color:#fff;opacity:.92}
+#iqBox .which{font-size:2.1vmin;font-weight:600;color:#fff;letter-spacing:.06em;margin-top:.5vmin}
+#iqBox .rule{width:14vmin;height:1px;margin:.5vmin 0;background:linear-gradient(90deg,transparent,rgba(227,189,118,.75),transparent)}
+@media (orientation:landscape){#iqBox .headline{font-size:min(7.6vmin,8.6vw)}#iqBox .ar{font-size:3vmin}#iqBox .which{font-size:2.5vmin}}
+</style>
+</head>
+<body>
+<div class="hot"></div><a class="back" id="back" href="index.html">← Back to website</a>
+<div class="frame">
+  <div class="left">
+    <div class="head">
+      <img class="minaret l" src="assets/minaret-white.png" alt="">
+      <img class="minaret r" src="assets/minaret-white.png" alt="">
+      <div class="in">
+      <div class="bism">&#x628;&#x650;&#x633;&#x652;&#x645;&#x650; &#x627;&#x644;&#x644;&#x651;&#x670;&#x647;&#x650; &#x627;&#x644;&#x631;&#x651;&#x64E;&#x62D;&#x652;&#x645;&#x670;&#x646;&#x650; &#x627;&#x644;&#x631;&#x651;&#x64E;&#x62D;&#x650;&#x64A;&#x645;&#x650;</div>
+      <div class="mname" id="mname">AASIYA MUSALLA</div>
+      <div class="dates"><div id="greg">—</div><div id="hijri">—</div></div>
+      <div class="clock" id="clock">--:--:-- --</div>
+      </div>
+    </div>
+    <div class="strip">
+      <div class="tile"><div class="k">SUNSET</div><div class="v seg" id="sunrise">—</div></div>
+      <div class="tile"><div class="k">NEXT</div><div class="v" id="next">—</div></div>
+      <div class="tile"><div class="k">TIME REMAINING</div><div class="v seg" id="remain">--:--:--</div></div>
+    </div>
+  </div>
+  <div class="table">
+    <div class="thead"><span>PRAYER</span><span>BEGIN</span><span>IQAMAH</span></div>
+    <div class="rows" id="rows"></div>
+  </div>
+  <div class="ticker"><div class="track" id="track"><i>◆</i>Loading…</div></div>
+</div>
+
+<div id="iqScrim"><div id="iqBox">
+  <div class="kick">It is now</div>
+  <div class="headline" id="iqBoxHeadline">Iqamah Time</div>
+  <div class="ar" id="iqBoxAr">&#x627;&#x644;&#x625;&#x642;&#x627;&#x645;&#x629;</div>
+  <div class="rule"></div>
+  <div class="which" id="iqBoxPrayer">Maghrib</div>
+</div></div>
+<script src="site.js"></script>
+<script>
+(function(){
+const A=window.Aasiya, $=id=>document.getElementById(id);
+let DAY=null, DAYKEY="", TOMORROW=null;
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function fmtHMS(secs){secs=Math.max(0,secs|0);return A.pad2(Math.floor(secs/3600))+":"+A.pad2(Math.floor(secs%3600/60))+":"+A.pad2(secs%60);}
+const HM={1:"Muharram",2:"Safar",3:"Rabi al-Awwal",4:"Rabi al-Thani",5:"Jumada al-Ula",6:"Jumada al-Akhirah",7:"Rajab",8:"Shaban",9:"Ramadan",10:"Shawwal",11:"Dhul Qadah",12:"Dhul Hijjah"};
+function classicHijri(h){if(!h)return"";const d=+h.day+Math.round(A.CFG.hijriOffset||0);return d+" "+(HM[+h.month.number]||h.month.en)+", "+h.year+" AH";}
+function fmtClock(n){const h12=n.h%12||12;return h12+":"+A.pad2(n.mi)+":"+A.pad2(n.s)+'<span class="ap">'+(n.h<12?"AM":"PM")+'</span>';}
+function segTime(h){if(h==null)return"—";const t=A.fmtTime(h);const m=t.match(/^(.*?)\s*(AM|PM)$/i);return m?m[1]+'<span class="ap">'+m[2].toUpperCase()+'</span>':t;}
+
+/* the classic board rule: the row whose iqamah just passed (still inside the hold window) shows its iqamah in red;
+   the upcoming prayer row is the light highlighted "Next prayer" row */
+function state(n){
+  const fi=A.focusIndex(DAY,n.hours);
+  let cur=fi>=0?DAY.prayers[fi]:null;
+  let nextIdx=-1, redIdx=-1;
+  if(cur){
+    const held=cur.iq!=null && n.hours>=cur.iq;
+    if(held){ redIdx=fi; nextIdx=fi+1<5?fi+1:-1; }
+    else nextIdx=fi;
+  }
+  return {fi,nextIdx,redIdx};
+}
+function renderRows(){
+  if(!DAY){$("rows").innerHTML="";return;}
+  const n=A.mosqueNow(), s=state(n);
+  $("rows").innerHTML=DAY.prayers.map((p,i)=>{
+    const cls=["row"]; if(i===s.nextIdx)cls.push("next"); if(i===s.redIdx)cls.push("passed"); if(p.key==="maghrib")cls.push("maghrib");
+    const iq=p.iq!=null?segTime(p.iq):esc(p.iqText||"—");
+    return '<div class="'+cls.join(" ")+'" data-i="'+i+'"><span class="nm">'+p.label+(i===s.nextIdx?'<small>Next prayer</small>':'')+'</span><span>'+segTime(p.begin)+'</span><span class="iq">'+iq+'</span></div>';
+  }).join("");
+  $("sunrise").innerHTML=segTime(DAY.sunset);
+  $("hijri").textContent=classicHijri(DAY.hijri);
+  $("mname").textContent=(A.CFG.mosqueName||"Aasiya Musalla").toUpperCase();
+}
+function renderTicker(){
+  const n=A.mosqueNow(), list=A.activeAnnouncements(n).map(a=>a.message);
+  if(TOMORROW){const m=TOMORROW.prayers[3]; if(m&&m.iq!=null) list.push("Tomorrow's Maghrib prayer will be at "+A.fmtTime(m.iq));}
+  if(!list.length) list.push("Welcome to "+(A.CFG.mosqueName||"Aasiya Musalla"));
+  const html=list.map(t=>'<i>◆</i>'+esc(t)).join("");
+  const tr=$("track"); if(tr.dataset.html!==html){tr.innerHTML=html; tr.dataset.html=html;
+    const chars=list.join(" ").length; tr.style.setProperty("--tk",Math.max(20,Math.round(chars/6+18))+"s");}
+}
+
+/* Adhan/Iqamah status box: fires the instant an adhan or iqamah is reached,
+   stays for CFG.iqamahBoxSeconds, then fades out. Once per event per day. */
+let iqBoxUntil=0, iqBoxSeen={}, iqBoxFading=false;
+function statusBox(n){
+  if(!DAY)return;
+  const boxMs=Math.max(1,A.CFG.iqamahBoxSeconds||60)*1000;
+  DAY.prayers.forEach(p=>{
+    [["begin",p.begin],["iqamah",p.iq]].forEach(([type,h])=>{
+      if(h==null)return;
+      const since=(n.hours-h)*3600;
+      const key=DAYKEY+"|"+p.key+"|"+type+"|"+Math.round(h*3600);
+      if(since>=0&&since*1000<boxMs&&!iqBoxSeen[key]){
+        iqBoxSeen[key]=true; iqBoxUntil=Date.now()+(boxMs-since*1000);
+        const isAdhan=type==="begin";
+        $("iqBoxHeadline").textContent=isAdhan?"Adhan Time":"Iqamah Time";
+        $("iqBoxAr").textContent=isAdhan?"\u0627\u0644\u0623\u0630\u0627\u0646":"\u0627\u0644\u0625\u0642\u0627\u0645\u0629";
+        $("iqBoxPrayer").textContent=p.label;
+      }
+    });
+  });
+  const scrim=$("iqScrim"), show=Date.now()<iqBoxUntil;
+  if(show){iqBoxFading=false;scrim.classList.remove("out");scrim.classList.add("on");}
+  else if(scrim.classList.contains("on")&&!iqBoxFading){iqBoxFading=true;scrim.classList.add("out");setTimeout(()=>{scrim.classList.remove("on","out");iqBoxFading=false;},500);}
+}
+function tick(){
+  const n=A.mosqueNow(), key=n.y+"-"+n.m+"-"+n.d;
+  if(key!==DAYKEY){DAY=A.buildDay(n);DAYKEY=DAY?key:"";renderRows();ensureAdhan(n);renderTicker();}
+  $("clock").innerHTML=fmtClock(n);
+  $("greg").textContent=new Date().toLocaleDateString("en-US",{timeZone:"America/Regina",weekday:"long",month:"long",day:"numeric",year:"numeric"});
+  if(!DAY)return;
+  statusBox(n);
+  const s=state(n);
+  let target=null, targetH=null;
+  if(s.nextIdx>=0){target=DAY.prayers[s.nextIdx];targetH=target.begin;}
+  else if(TOMORROW){target=TOMORROW.prayers[0];targetH=target.begin+24;}
+  if(target){$("next").textContent=target.label;$("remain").textContent=fmtHMS(Math.round((targetH-n.hours)*3600));}
+  const cur=document.querySelector("#rows .row.next"); const idx=cur?+cur.dataset.i:-1;
+  const red=document.querySelector("#rows .row.passed"); const ridx=red?+red.dataset.i:-1;
+  if(idx!==s.nextIdx||ridx!==s.redIdx)renderRows();
+}
+function ensureAdhan(n){
+  const nm=n.m===12?{y:n.y+1,m:1}:{y:n.y,m:n.m+1};
+  Promise.all([A.fetchAdhan(n.y,n.m),A.fetchAdhan(nm.y,nm.m)]).then(()=>{
+    if(!DAY){DAY=A.buildDay(n);DAYKEY=DAY?n.y+"-"+n.m+"-"+n.d:"";renderRows();}
+    const d=new Date(Date.UTC(n.y,n.m-1,n.d+1));TOMORROW=A.buildDay({y:d.getUTCFullYear(),m:d.getUTCMonth()+1,d:d.getUTCDate()});
+    renderTicker();
+  }).catch(()=>{});
+}
+function sync(){A.fetchSheet().then(()=>{A.applySettings();DAYKEY="";tick();}).catch(()=>{renderTicker();});}
+A.applySettings();ensureAdhan(A.mosqueNow());sync();tick();
+setInterval(tick,1000);setInterval(sync,5*60*1000);
+// align the clock to the device second
+setTimeout(()=>{tick();},1000-(Date.now()%1000));
+
+/* back tab: touch tap reveals; second tap follows the link */
+const back=$("back");let shown=0;
+document.addEventListener("touchstart",e=>{if(e.touches[0].clientY<60&&e.touches[0].clientX<160){back.classList.add("show");shown=Date.now();setTimeout(()=>back.classList.remove("show"),4000);}},{passive:true});
+back.addEventListener("click",e=>{if(Date.now()-shown<700&&matchMedia("(hover:none)").matches)e.preventDefault();});
+if(document.referrer&&new URL(document.referrer).origin===location.origin)back.textContent="← Back to website";else back.textContent="← Go to website";
+})();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a369b3030b2cfe54',t:'MTc4ODY1ODEzMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
