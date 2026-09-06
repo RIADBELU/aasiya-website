@@ -231,6 +231,6 @@ html[data-theme="dark"] .tophdr,html[data-theme="dark"] .main{background:transpa
 html[data-theme="dark"] .toast{background:var(--gold);color:var(--green-2)}
 
 /* reCAPTCHA */
-.captcha{margin:14px 0 4px;min-height:78px}
+.captcha{margin:34px 0 4px;min-height:78px}
 .captcha iframe{border-radius:6px}
 @media (max-width:360px){.captcha{transform:scale(.88);transform-origin:0 0}}
