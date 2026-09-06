@@ -1,0 +1,16 @@
+# Aasiya Musalla — robots.txt
+# Public site is indexable; admin and TV-display pages are not meant for search.
+
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /prayerdisplay.html
+Disallow: /oldtvdisplay.html
+Disallow: /currentdisplay.html
+Disallow: /AppsScript.gs
+Disallow: /assets/preview-old.png
+Disallow: /assets/preview-new.png
+Disallow: /assets/preview-current.png
+
+# Uncomment and set your real domain if you add a sitemap later:
+# Sitemap: https://YOUR-DOMAIN/sitemap.xml
