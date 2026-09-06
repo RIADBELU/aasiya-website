@@ -3,13 +3,13 @@
 
 User-agent: *
 Allow: /
-Disallow: /admin.html
-Disallow: /prayerdisplay.html
-Disallow: /oldtvdisplay.html
-Disallow: /currentdisplay.html
+Allow: /admin.html
+Allow: /prayerdisplay.html
+Allow: /oldtvdisplay.html
+Allow: /currentdisplay.html
 Disallow: /AppsScript.gs
-Disallow: /assets/preview-old.png
-Disallow: /assets/preview-new.png
-Disallow: /assets/preview-current.png
+Allow: /assets/preview-old.png
+Allow: /assets/preview-new.png
+Allow: /assets/preview-current.png
 
 Sitemap: https://aasiyaregina.xubi.org/sitemap.xml
