@@ -12,5 +12,4 @@ Disallow: /assets/preview-old.png
 Disallow: /assets/preview-new.png
 Disallow: /assets/preview-current.png
 
-# Uncomment and set your real domain if you add a sitemap later:
-# Sitemap: https://YOUR-DOMAIN/sitemap.xml
+Sitemap: https://aasiyaregina.xubi.org/sitemap.xml
