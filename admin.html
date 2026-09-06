@@ -6,10 +6,11 @@
 <title>Admin — Aasiya Musalla</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="site.css?v=202609050548">
-<link rel="stylesheet" href="admin.css?v=202609050548">
+<link rel="stylesheet" href="admin.css?v=202609060010">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<script src="https://www.google.com/recaptcha/api.js?onload=captchaReady&render=explicit" async defer></script>
 </head>
 <body class="adm">
 
@@ -25,6 +26,7 @@
       <input id="email" type="email" autocomplete="username" required>
       <label for="pass">Password</label>
       <div class="pw"><input id="pass" type="password" autocomplete="current-password" required><button type="button" id="pwToggle" aria-label="Show password">Show</button></div>
+      <div class="captcha"><div id="captcha"></div></div>
       <div class="err" id="loginErr"></div>
       <button class="btn btn-gold btn-lg" type="submit" id="loginBtn">Sign in</button>
     </form>
@@ -236,6 +238,13 @@ const A=window.Aasiya, $=id=>document.getElementById(id);
    Credentials are checked against a SHA-256 hash so the password never appears
    in the file. (A light gate for a public notice board, not bank-grade security.) */
 const ADMIN_EMAIL="riadkabashi569@gmail.com";
+/* Google reCAPTCHA v2 ("I'm not a robot" checkbox).
+   Site key registered for aasiyaregina.xubi.org — manage at https://www.google.com/recaptcha/admin */
+const RECAPTCHA_SITE_KEY="6LfaG6wtAAAAAC-Pa0i6ILurTOyt8w9UCyeuGcJW";
+let captchaId=null;
+window.captchaReady=function(){ try{ captchaId=grecaptcha.render("captcha",{sitekey:RECAPTCHA_SITE_KEY,theme:document.documentElement.dataset.theme==="dark"?"dark":"light",callback:()=>{document.getElementById("loginErr").textContent="";}}); }catch(e){} };
+function captchaOK(){ if(typeof grecaptcha==="undefined"||captchaId===null) return navigator.onLine===false; return !!grecaptcha.getResponse(captchaId); }
+function captchaReset(){ try{ grecaptcha.reset(captchaId); }catch(e){} }
 const ADMIN_HASH ="c56f5d6dbe8ecb69893caf34308d84a81e9b2cf331385e79e3071fd7f7e36673";
 const SESSION_KEY="aasiya.admin.session";
 
@@ -255,11 +264,12 @@ $("loginForm").addEventListener("submit",async e=>{
   e.preventDefault(); $("loginErr").textContent="";
   const email=$("email").value.trim().toLowerCase(), pass=$("pass").value;
   if(!crypto.subtle){ $("loginErr").textContent="Open this page over https:// or localhost to sign in."; return; }
+  if(!captchaOK()){ $("loginErr").textContent="Please tick “I'm not a robot” first."; return; }
   $("loginBtn").disabled=true;
   if(email===ADMIN_EMAIL && await sha256(pass)===ADMIN_HASH){
     sessionStorage.setItem(SESSION_KEY,JSON.stringify({email,exp:Date.now()+8*3600*1000}));
     $("pass").value=""; boot(email);
-  }else{ $("loginErr").textContent="Incorrect email or password."; $("pass").select(); $("loginBtn").disabled=false; }
+  }else{ $("loginErr").textContent="Incorrect email or password."; $("pass").select(); $("loginBtn").disabled=false; captchaReset(); }
 });
 $("logoutLink").onclick=e=>{ e.preventDefault(); sessionStorage.removeItem(SESSION_KEY); location.hash=""; location.reload(); };
 
@@ -484,5 +494,5 @@ const s=session(); if(s) boot(s.email); else $("email").focus();
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a362f34fac370b4b',t:'MTc4ODU4NzM2Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a36ae0e9bf8b50d0',t:'MTc4ODY3MDQ5Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
