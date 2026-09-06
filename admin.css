@@ -229,3 +229,8 @@ html[data-theme="dark"] .rawwrap,html[data-theme="dark"] .health li,html[data-th
 html[data-theme="dark"] .tbl th,html[data-theme="dark"] .tbl td{border-color:var(--line)}
 html[data-theme="dark"] .tophdr,html[data-theme="dark"] .main{background:transparent}
 html[data-theme="dark"] .toast{background:var(--gold);color:var(--green-2)}
+
+/* reCAPTCHA */
+.captcha{margin:14px 0 4px;min-height:78px}
+.captcha iframe{border-radius:6px}
+@media (max-width:360px){.captcha{transform:scale(.88);transform-origin:0 0}}
