@@ -76,7 +76,7 @@ body{font-family:var(--font);color:var(--txt);font-weight:800;-webkit-font-smoot
 @keyframes scroll{to{transform:translateX(-100%)}}
 
 /* ---- landscape ---- */
-@media (orientation:landscape){
+@media (orientation:landscape){.clock .ap{display:none}
   :root{--u:1vh}
   .frame{display:grid;grid-template-columns:34vw 1fr;grid-template-rows:1fr auto;gap:1.2vmin}
   .left{display:flex;flex-direction:column;gap:1.2vmin;min-height:0}
@@ -252,5 +252,5 @@ back.addEventListener("click",e=>{if(Date.now()-shown<700&&matchMedia("(hover:no
 if(document.referrer&&new URL(document.referrer).origin===location.origin)back.textContent="← Back to website";else back.textContent="← Go to website";
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a369b3030b2cfe54',t:'MTc4ODY1ODEzMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
