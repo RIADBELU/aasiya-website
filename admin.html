@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Panel — Aasiya Musalla</title>
+<title>Admin — Aasiya Musalla</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="site.css?v=202609050548">
-<link rel="stylesheet" href="admin.css?v=202609070500">
+<link rel="stylesheet" href="admin.css?v=202609070600">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -618,7 +618,7 @@ $("setForm").addEventListener("submit",async e=>{
 });
 /* preview */
 let pvLoaded=false;
-function pvFit(){ const w=$("pvWrap"); if(!w) return; w.style.setProperty("--pvw",String(w.clientWidth-12)); }
+function pvFit(){ const w=$("pvWrap"), f=$("pvFrame"); if(!w||!f) return; const land=w.classList.contains("land"); const W=land?1920:1080, H=land?1080:1920; const s=Math.min(w.clientWidth/W, w.clientHeight/H); f.style.width=W+"px"; f.style.height=H+"px"; f.style.transform="scale("+s+")"; f.style.left=((w.clientWidth-W*s)/2)+"px"; f.style.top=((w.clientHeight-H*s)/2)+"px"; }
 window.addEventListener("resize",pvFit); new ResizeObserver(pvFit).observe($("pvWrap"));
 function pvEnsure(){ if(pvLoaded) return; pvLoaded=true; $("pvFrame").src="prayerdisplay.html?preview=1&t="+Date.now(); }
 $("pvReload").onclick=()=>{ $("pvFrame").src="prayerdisplay.html?preview=1&t="+Date.now(); };
@@ -645,5 +645,5 @@ const s=session(); if(s) boot(s.email); else $("email").focus();
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a37995e1fa26a14f',t:'MTc4ODgyNDcwOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a379a202ace80c5d',t:'MTc4ODgyNTIwNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
