@@ -6,7 +6,7 @@
 <title>Admin — Aasiya Musalla</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="site.css?v=202609050548">
-<link rel="stylesheet" href="admin.css?v=202609060020">
+<link rel="stylesheet" href="admin.css?v=202609070400">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -26,6 +26,7 @@
       <input id="email" type="email" autocomplete="username" required>
       <label for="pass">Password</label>
       <div class="pw"><input id="pass" type="password" autocomplete="current-password" required><button type="button" id="pwToggle" aria-label="Show password">Show</button></div>
+      <label class="remember" for="remember"><span class="remember-txt"><b>Remember me</b><small>Stay signed in on this device for 30 days</small></span><span class="tog"><input type="checkbox" id="remember"><i></i></span></label>
       <div class="captcha"><div id="captcha"></div></div>
       <div class="err" id="loginErr"></div>
       <button class="btn btn-gold btn-lg" type="submit" id="loginBtn">Sign in</button>
@@ -40,11 +41,16 @@
   <aside class="side">
     <a class="brand" href="index.html"><img src="assets/mark.png" alt="" width="44" height="34"><span>Aasiya Musalla<small>Admin</small></span></a>
     <nav class="sidenav">
-      <a href="#overview" data-view="overview" class="active"><i>◎</i>Overview</a>
-      <a href="#iqamah" data-view="iqamah"><i>◷</i>Iqamah schedule</a>
-      <a href="#announcements" data-view="announcements"><i>▤</i>Announcements <b class="cnt" id="navAnnCount"></b></a>
-      <a href="#sheet" data-view="sheet"><i>⌗</i>Data &amp; sheet</a>
+      <a href="#overview" data-view="overview" class="active"><i>◎</i><span class="nl">Overview</span><span class="ns">Overview</span></a>
+      <a href="#iqamah" data-view="iqamah"><i>◷</i><span class="nl">Iqamah schedule</span><span class="ns">Iqamah</span></a>
+      <a href="#announcements" data-view="announcements"><i>▤</i><span class="nl">Announcements</span><span class="ns">Notices</span><b class="cnt" id="navAnnCount"></b></a>
+      <a href="#display" data-view="display"><i>▣</i><span class="nl">Display settings</span><span class="ns">Display</span><b class="cnt" id="navSetCount"></b></a>
+      <a href="#sheet" data-view="sheet"><i>⌗</i><span class="nl">Data &amp; sheet</span><span class="ns">Data</span></a>
     </nav>
+    <div class="side-tv">
+      <span class="k">TV display</span>
+      <div class="tvrow"><a href="prayerdisplay.html" target="_blank" rel="noopener">New</a><a href="currentdisplay.html" target="_blank" rel="noopener">Current</a><a href="oldtvdisplay.html" target="_blank" rel="noopener">Old</a></div>
+    </div>
     <div class="side-foot">
       <button class="theme-row" id="themeBtn" type="button"><span>Dark mode</span><i class="sw"><b></b></i></button>
       <div class="conn" id="conn"><i></i><span>Checking connection…</span></div>
@@ -52,6 +58,14 @@
     </div>
   </aside>
 
+  <div class="side-backdrop" id="sideBackdrop"></div>
+  <nav class="tabbar" aria-label="Sections">
+    <a href="#overview" data-view="overview" class="active"><i>◎</i>Overview</a>
+    <a href="#iqamah" data-view="iqamah"><i>◷</i>Iqamah</a>
+    <a href="#announcements" data-view="announcements"><i>▤</i>Notices</a>
+    <a href="#display" data-view="display"><i>▣</i>Display</a>
+    <a href="#sheet" data-view="sheet"><i>⌗</i>Data</a>
+  </nav>
   <div class="main">
     <header class="tophdr">
       <button class="menu-btn side-toggle" id="sideToggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
@@ -103,6 +117,7 @@
           <div class="panel-h"><h2>Quick actions</h2></div>
           <div class="qa">
             <a href="#iqamah" class="qa-item"><i>◷</i><div><b>Change iqamah times</b><span>Edit the current schedule — changes go live within 5 minutes.</span></div></a>
+            <a href="#display" class="qa-item"><i>▣</i><div><b>Display settings</b><span>Ticker speed, alert lengths, text size and more.</span></div></a>
             <a href="#announcements" class="qa-item" id="qaAnn"><i>▤</i><div><b>Post an announcement</b><span>Shown on the website and scrolled across the TV ticker.</span></div></a>
             <a href="prayerdisplay.html" target="_blank" rel="noopener" class="qa-item"><i>▣</i><div><b>Preview the TV display</b><span>Opens in a new tab — press F for full screen.</span></div></a>
           </div>
@@ -199,6 +214,42 @@
       </div>
     </section>
 
+
+    <!-- ---------- DISPLAY SETTINGS ---------- -->
+    <section class="view" data-view="display" hidden>
+      <div class="cols set-cols">
+        <div class="panel">
+          <div class="panel-h"><h2>TV display settings</h2><span class="hint">Saved to the “Settings” tab · the TV picks changes up within <span id="setRefresh">5</span> min</span></div>
+          <form id="setForm" class="setform">
+            <div id="setGroups"></div>
+            <div class="formfoot sticky">
+              <span class="msg" id="setMsg"></span>
+              <button class="btn btn-ghost" type="button" id="setReset">Discard changes</button>
+              <button class="btn btn-gold" type="submit" id="setSave" disabled>Save settings</button>
+            </div>
+          </form>
+        </div>
+        <div class="setside">
+          <div class="panel">
+            <div class="panel-h"><h2>Live preview</h2><span class="hint" id="pvHint">portrait</span></div>
+            <div class="pvwrap" id="pvWrap"><iframe id="pvFrame" title="TV display preview" loading="lazy"></iframe></div>
+            <div class="pvtools">
+              <div class="seg small" id="pvOrient"><button class="on" data-o="p">Portrait</button><button data-o="l">Landscape</button></div>
+              <button class="btn btn-ghost btn-sm" type="button" id="pvReload">↻ Refresh preview</button>
+            </div>
+            <p class="sub">The preview shows the display as it is <b>right now</b> (saved settings). Save, then refresh to see your changes.</p>
+          </div>
+          <div class="panel">
+            <div class="panel-h"><h2>How this works</h2></div>
+            <ul class="tips">
+              <li>Each setting has a built-in default. Settings you change are written to the Sheet; “Use default” removes the row so the display goes back to its factory value.</li>
+              <li>Adhan times are never edited here — they always come from AlAdhan (ISNA) for Regina.</li>
+              <li>Iqamah times live in the <a href="#iqamah">Iqamah schedule</a>, announcements in <a href="#announcements">Announcements</a>.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
     <!-- ---------- SHEET ---------- -->
     <section class="view" data-view="sheet" hidden>
       <div class="cols">
@@ -257,7 +308,11 @@ const todayKey=()=>{const n=A.mosqueNow();return n.y+"-"+A.pad2(n.m)+"-"+A.pad2(
 const fmtIq=iq=>iq.hours!=null?A.fmtTime(iq.hours):(iq.text||"—");
 
 async function sha256(s){ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
-function session(){ try{ const s=JSON.parse(sessionStorage.getItem(SESSION_KEY)||"null"); return s&&s.email===ADMIN_EMAIL&&s.exp>Date.now()?s:null; }catch(e){return null;} }
+const REMEMBER_KEY="aasiya.admin.remember";
+function readSess(store){ try{ const s=JSON.parse(store.getItem(SESSION_KEY)||"null"); return s&&s.email===ADMIN_EMAIL&&s.exp>Date.now()?s:null; }catch(e){return null;} }
+function session(){ return readSess(sessionStorage)||readSess(localStorage); }
+function clearSession(){ sessionStorage.removeItem(SESSION_KEY); localStorage.removeItem(SESSION_KEY); }
+(function(){ try{ if(localStorage.getItem(REMEMBER_KEY)==="1"){ $("remember").checked=true; $("email").value=ADMIN_EMAIL; } }catch(e){} })();
 
 $("pwToggle").onclick=()=>{ const p=$("pass"); const show=p.type==="password"; p.type=show?"text":"password"; $("pwToggle").textContent=show?"Hide":"Show"; };
 $("loginForm").addEventListener("submit",async e=>{
@@ -267,18 +322,20 @@ $("loginForm").addEventListener("submit",async e=>{
   if(!captchaOK()){ $("loginErr").textContent="Please tick “I'm not a robot” first."; return; }
   $("loginBtn").disabled=true;
   if(email===ADMIN_EMAIL && await sha256(pass)===ADMIN_HASH){
-    sessionStorage.setItem(SESSION_KEY,JSON.stringify({email,exp:Date.now()+8*3600*1000}));
+    const remember=$("remember").checked; clearSession();
+    if(remember){ localStorage.setItem(SESSION_KEY,JSON.stringify({email,exp:Date.now()+30*24*3600*1000})); localStorage.setItem(REMEMBER_KEY,"1"); }
+    else{ sessionStorage.setItem(SESSION_KEY,JSON.stringify({email,exp:Date.now()+8*3600*1000})); localStorage.removeItem(REMEMBER_KEY); }
     $("pass").value=""; boot(email);
   }else{ $("loginErr").textContent="Incorrect email or password."; $("pass").select(); $("loginBtn").disabled=false; captchaReset(); }
 });
-$("logoutLink").onclick=e=>{ e.preventDefault(); sessionStorage.removeItem(SESSION_KEY); location.hash=""; location.reload(); };
+$("logoutLink").onclick=e=>{ e.preventDefault(); clearSession(); location.hash=""; location.reload(); };
 
 /* ---- Toast ---- */
 let toastT=null;
 function toast(msg,kind){ const t=$("toast"); t.textContent=msg; t.className="toast "+(kind||""); t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,3600); }
 
 /* ---- Write ---- */
-let WRITE_OK=null; // null unknown, true, false
+let WRITE_OK=null, SET_WRITE_OK=false; // null unknown, true, false
 async function write(action,payload){
   const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({secret:WRITE_SECRET,action},payload||{}))});
   const txt=await r.text(); let j={}; try{ j=JSON.parse(txt); }catch(e){}
@@ -289,7 +346,7 @@ async function write(action,payload){
   return j;
 }
 async function pingWriter(){
-  try{ const j=await write("ping"); WRITE_OK=true; if(!j.version||j.version<2){ WRITE_OK=false; $("setupText").innerHTML="The Apps Script is an <b>old version</b> without iqamah editing. Paste the latest <code>AppsScript.gs</code> and deploy a <em>New version</em>."; } }
+  try{ const j=await write("ping"); WRITE_OK=true; SET_WRITE_OK=!!j.version&&j.version>=3; if(!j.version||j.version<2){ WRITE_OK=false; $("setupText").innerHTML="The Apps Script is an <b>old version</b> without iqamah editing. Paste the latest <code>AppsScript.gs</code> and deploy a <em>New version</em>."; } }
   catch(err){ WRITE_OK=false; $("setupText").innerHTML=esc(err.message)+" Until then you can still edit the Sheet directly with “Open Sheet”."; }
   $("setupBanner").hidden=WRITE_OK===true;
   paintConn();
@@ -302,16 +359,19 @@ function paintConn(){
 }
 
 /* ---- Views ---- */
-const TITLES={overview:"Overview",iqamah:"Iqamah schedule",announcements:"Announcements",sheet:"Data & sheet"};
+const TITLES={overview:"Overview",iqamah:"Iqamah schedule",announcements:"Announcements",display:"Display settings",sheet:"Data & sheet"};
 function showView(v){
   if(!TITLES[v]) v="overview";
   document.querySelectorAll(".view").forEach(s=>s.hidden=s.dataset.view!==v);
-  document.querySelectorAll(".sidenav a").forEach(a=>a.classList.toggle("active",a.dataset.view===v));
+  document.querySelectorAll(".sidenav a,.tabbar a").forEach(a=>a.classList.toggle("active",a.dataset.view===v));
+  if(v==="display") pvEnsure();
   $("viewTitle").textContent=TITLES[v]; document.body.classList.remove("side-open");
   window.scrollTo({top:0});
 }
 window.addEventListener("hashchange",()=>showView(location.hash.slice(1)));
 $("sideToggle").onclick=()=>document.body.classList.toggle("side-open");
+$("sideBackdrop").onclick=()=>document.body.classList.remove("side-open");
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") document.body.classList.remove("side-open"); });
 
 /* ---- Data ---- */
 let DAY=null, TODAY=null, ROWS=[], SCHED=[], CUR_SCHED=0, DIRTY=false, EDIT=null, FILTER="all";
@@ -329,9 +389,9 @@ async function loadAll(){
   if(!DIRTY) CUR_SCHED=Math.max(0,best);
   SCHED.forEach((s,i)=>s.inEffect=i===best);
   $("syncedAt").textContent="Synced "+new Date().toLocaleTimeString("en-CA",{timeZone:"America/Regina",hour:"numeric",minute:"2-digit"});
-  renderOverview(); renderIqamah(); renderAnn(); renderSheet(); paintConn();
+  renderOverview(); renderIqamah(); renderAnn(); renderSettings(); renderSheet(); paintConn();
 }
-$("reloadBtn").onclick=()=>{ if(DIRTY&&!confirm("You have unsaved iqamah changes. Reload anyway?")) return; DIRTY=false; loadAll().then(()=>toast("Data reloaded")); };
+$("reloadBtn").onclick=()=>{ if((DIRTY||SET_DIRTY)&&!confirm("You have unsaved changes. Reload anyway?")) return; DIRTY=false; SET_DIRTY=false; loadAll().then(()=>toast("Data reloaded")); };
 
 /* ---- Overview ---- */
 function renderOverview(){
@@ -473,6 +533,97 @@ function renderSheet(){
   $("rawSet").innerHTML=grid(s.settings||[],["key","value"]);
 }
 
+
+/* ---- Display settings ---------------------------------------------------
+   Every key below exists in the TV display's CFG (prayerdisplay.html). The Sheet's
+   "Settings" tab only holds overrides; an absent key means "built-in default". */
+const SETTINGS=[
+  {g:"Identity", items:[
+    {k:"mosqueName",t:"text",d:"Aasiya Musalla",l:"Mosque name",h:"Shown at the top of the display and the browser tab."},
+    {k:"location",t:"text",d:"Regina, Saskatchewan",l:"Location line",h:"Small line under the name."}]},
+  {g:"Prayer logic", items:[
+    {k:"maghribIqamahMinutes",t:"num",d:5,min:0,max:60,u:"min",l:"Maghrib iqamah after sunset",h:"Used when the Maghrib cell in the schedule is blank or “+N”."},
+    {k:"highlightHoldMinutes",t:"num",d:10,min:0,max:120,u:"min",l:"Keep highlight after iqamah",h:"How long the current prayer stays highlighted after its iqamah before moving on."},
+    {k:"hijriOffset",t:"num",d:0,min:-2,max:2,u:"days",l:"Hijri date adjustment",h:"Shift the Hijri date by −1 / +1 day to match the local moon-sighting."}]},
+  {g:"Iqamah alerts", items:[
+    {k:"iqamahAlertMinutes",t:"num",d:3,min:0,max:30,u:"min",l:"Countdown before iqamah",h:"Full-screen countdown starts this many minutes before iqamah (0 = off)."},
+    {k:"prayerDurationMinutes",t:"num",d:8,min:0,max:60,u:"min",l:"“Silence your phone” screen",h:"How long the takeover stays up after iqamah for Dhuhr–Isha (0 = off)."},
+    {k:"fajrDurationMinutes",t:"num",d:12,min:0,max:60,u:"min",l:"“Silence your phone” — Fajr",h:"Fajr is usually longer."},
+    {k:"iqamahBoxSeconds",t:"num",d:60,min:0,max:600,u:"sec",l:"“Iqamah Time” box duration",h:"The blurred status box that appears at adhan and iqamah time."}]},
+  {g:"Announcements ticker", items:[
+    {k:"tickerSeconds",t:"num",d:12,min:3,max:120,u:"sec",l:"Seconds per announcement",h:"For short messages that fit without scrolling."},
+    {k:"tickerSpeed",t:"num",d:60,min:10,max:300,u:"px/s",l:"Scroll speed",h:"For long messages that scroll."},
+    {k:"tickerScale",t:"range",d:1,min:0.7,max:1.8,step:0.05,l:"Announcement text size",h:"1 = normal."},
+    {k:"footerScale",t:"range",d:1,min:0.7,max:1.6,step:0.05,l:"Footer bar size",h:"Scales the whole bottom strip."}]},
+  {g:"Behaviour", items:[
+    {k:"nameSwapSeconds",t:"num",d:10,min:0,max:120,u:"sec",l:"English ⇄ Arabic name swap",h:"Prayer names alternate languages every N seconds (0 = English only)."},
+    {k:"refreshMinutes",t:"num",d:5,min:1,max:120,u:"min",l:"Self-sync interval",h:"How often the display re-reads the Sheet and adhan times."},
+    {k:"showSeconds",t:"bool",d:true,l:"Show seconds",h:"Small seconds readout in the corner of the clock."},
+    {k:"burnInProtection",t:"bool",d:true,l:"Burn-in protection",h:"Slowly nudges the layout by a few pixels to protect the TV panel."}]}
+];
+const SET_ALL=SETTINGS.flatMap(g=>g.items);
+let SET_DIRTY=false, SET_CUR={};   // SET_CUR = raw string values currently in the Sheet (keyed)
+const setFmt=(it,v)=>it.t==="bool"?(v?"On":"Off"):String(v);
+function setParse(it,raw){ if(raw==null) return null; const v=String(raw).trim(); if(!v) return null;
+  if(it.t==="bool") return /^(true|yes|on|1)$/i.test(v); if(it.t==="num"||it.t==="range"){ const n=parseFloat(v.replace(/[^\d.\-]/g,"")); return isNaN(n)?null:n; } return v; }
+function renderSettings(){
+  SET_CUR={}; (A.SHEET().settings||[]).forEach(r=>{ const k=String(r[0]||"").trim(); if(k&&k.toLowerCase()!=="key") SET_CUR[k]=r[1]==null?"":String(r[1]); });
+  const unknown=Object.keys(SET_CUR).filter(k=>!SET_ALL.some(it=>it.k===k));
+  $("navSetCount").textContent=Object.keys(SET_CUR).length||"";
+  $("setRefresh").textContent=Math.round(setParse(SET_ALL.find(i=>i.k==="refreshMinutes"),SET_CUR.refreshMinutes)??5);
+  $("setGroups").innerHTML=SETTINGS.map(g=>'<fieldset class="setgroup"><legend>'+g.g+'</legend>'+g.items.map(it=>{
+    const cur=setParse(it,SET_CUR[it.k]); const v=cur==null?it.d:cur; const over=cur!=null&&String(cur)!==String(it.d);
+    let ctl="";
+    if(it.t==="bool") ctl='<label class="tog"><input type="checkbox" data-k="'+it.k+'" '+(v?"checked":"")+'><i></i><span class="tv">'+setFmt(it,v)+'</span></label>';
+    else if(it.t==="range") ctl='<div class="rng"><input type="range" data-k="'+it.k+'" min="'+it.min+'" max="'+it.max+'" step="'+it.step+'" value="'+v+'"><output>'+(+v).toFixed(2).replace(/\.?0+$/,"")+'×</output></div>';
+    else if(it.t==="num") ctl='<div class="numin"><input type="number" inputmode="decimal" data-k="'+it.k+'" min="'+it.min+'" max="'+it.max+'" step="'+(it.step||1)+'" value="'+v+'"><span>'+(it.u||"")+'</span></div>';
+    else ctl='<input type="text" data-k="'+it.k+'" value="'+esc(v)+'" maxlength="60">';
+    return '<div class="setrow'+(over?" over":"")+'" data-row="'+it.k+'"><div class="sl"><label>'+esc(it.l)+'</label><span class="sh">'+esc(it.h)+'</span></div><div class="sc">'+ctl+
+      '<button type="button" class="dft" data-dft="'+it.k+'" title="Back to built-in default ('+esc(setFmt(it,it.d))+')">'+(over?"Use default ("+esc(setFmt(it,it.d))+")":"default: "+esc(setFmt(it,it.d)))+'</button></div></div>';
+  }).join("")+'</fieldset>').join("")+
+  (unknown.length?'<fieldset class="setgroup"><legend>Other keys in the Sheet</legend><p class="sub">These rows exist in the Settings tab but aren’t display settings this console knows about. They are left untouched.</p><div class="unk">'+unknown.map(k=>'<code>'+esc(k)+'</code> = <code>'+esc(SET_CUR[k])+'</code>').join("<br>")+'</div></fieldset>':'');
+  SET_DIRTY=false; setDirty();
+}
+function setValues(){ const o={}; $("setGroups").querySelectorAll("[data-k]").forEach(i=>{ const it=SET_ALL.find(x=>x.k===i.dataset.k); o[it.k]= it.t==="bool"? i.checked : it.t==="text"? i.value.trim() : (i.value===""?null:+i.value); }); return o; }
+const PENDING_DEFAULT=new Set();
+function setDirty(){
+  const vals=setValues(); let changed=0;
+  SET_ALL.forEach(it=>{ const row=$("setGroups").querySelector('[data-row="'+it.k+'"]'); if(!row) return;
+    const inSheet=setParse(it,SET_CUR[it.k]); const want=PENDING_DEFAULT.has(it.k)?null:vals[it.k];
+    const same = PENDING_DEFAULT.has(it.k) ? (inSheet==null) : (inSheet==null ? String(want)===String(it.d) && !(it.k in SET_CUR) : String(want)===String(inSheet));
+    row.classList.toggle("changed",!same); if(!same) changed++;
+    const out=row.querySelector("output"); if(out){ out.textContent=(+vals[it.k]).toFixed(2).replace(/\.?0+$/,"")+"×"; }
+    const tv=row.querySelector(".tv"); if(tv) tv.textContent=vals[it.k]?"On":"Off";
+  });
+  SET_DIRTY=changed>0; $("setSave").disabled=!SET_DIRTY; $("setMsg").textContent=SET_DIRTY?changed+" unsaved change"+(changed>1?"s":""):"";
+}
+$("setGroups").addEventListener("input",e=>{ const k=e.target.dataset.k; if(k){ PENDING_DEFAULT.delete(k); const row=e.target.closest(".setrow"); row.classList.remove("pending-default"); } setDirty(); });
+$("setGroups").addEventListener("click",e=>{ const b=e.target.closest("[data-dft]"); if(!b) return; const it=SET_ALL.find(x=>x.k===b.dataset.dft); const row=b.closest(".setrow"); const i=row.querySelector("[data-k]");
+  if(it.t==="bool") i.checked=!!it.d; else i.value=it.d; if(it.k in SET_CUR){ PENDING_DEFAULT.add(it.k); row.classList.add("pending-default"); } setDirty(); });
+$("setReset").onclick=()=>{ PENDING_DEFAULT.clear(); renderSettings(); };
+$("setForm").addEventListener("submit",async e=>{
+  e.preventDefault(); if(!SET_DIRTY) return;
+  if(WRITE_OK!==true){ toast("Saving isn’t connected — see the banner above","bad"); return; }
+  if(!SET_WRITE_OK){ toast("Your Apps Script is older than v3 — paste the latest AppsScript.gs and deploy a New version to save settings.","bad"); return; }
+  const vals=setValues(), put={}, del=[];
+  SET_ALL.forEach(it=>{ const row=$("setGroups").querySelector('[data-row="'+it.k+'"]'); if(!row||!row.classList.contains("changed")) return;
+    if(PENDING_DEFAULT.has(it.k)) del.push(it.k); else { const v=vals[it.k]; if(v==null||v==="") return; if(it.t==="num"||it.t==="range"){ if(v<it.min||v>it.max){ toast(it.l+" must be between "+it.min+" and "+it.max,"bad"); throw new Error("range"); } } put[it.k]= it.t==="bool"?(v?"true":"false"):String(v); } });
+  $("setSave").disabled=true; $("setMsg").textContent="Saving…";
+  try{
+    if(Object.keys(put).length) await write("settings_set",{settings:put});
+    if(del.length) await write("settings_del",{keys:del});
+    PENDING_DEFAULT.clear(); toast("Settings saved — the TV will update within a few minutes","ok");
+    await A.fetchSheet(); renderSettings(); renderOverview(); renderSheet();
+  }catch(err){ if(err.message!=="range") toast(err.message,"bad"); $("setSave").disabled=false; $("setMsg").textContent=""; }
+});
+/* preview */
+let pvLoaded=false;
+function pvFit(){ const w=$("pvWrap"); if(!w) return; w.style.setProperty("--pvw",String(w.clientWidth-12)); }
+window.addEventListener("resize",pvFit); new ResizeObserver(pvFit).observe($("pvWrap"));
+function pvEnsure(){ if(pvLoaded) return; pvLoaded=true; $("pvFrame").src="prayerdisplay.html?preview=1&t="+Date.now(); }
+$("pvReload").onclick=()=>{ $("pvFrame").src="prayerdisplay.html?preview=1&t="+Date.now(); };
+$("pvOrient").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; $("pvOrient").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); $("pvWrap").classList.toggle("land",b.dataset.o==="l"); pvFit(); $("pvHint").textContent=b.dataset.o==="l"?"landscape":"portrait"; };
+
 /* ---- Boot ---- */
 function boot(email){
   $("loginScreen").hidden=true; $("console").hidden=false; document.body.classList.add("in");
@@ -480,8 +631,8 @@ function boot(email){
   $("sheetLink").href=$("sheetLink2").href="https://docs.google.com/spreadsheets/d/"+A.SHEET_ID+"/edit";
   showView(location.hash.slice(1));
   loadAll(); pingWriter();
-  setInterval(tickOverview,1000); setInterval(()=>{ if(!DIRTY&&EDIT===null) loadAll(); },5*60*1000);
-  window.addEventListener("beforeunload",e=>{ if(DIRTY){ e.preventDefault(); e.returnValue=""; } });
+  setInterval(tickOverview,1000); setInterval(()=>{ if(!DIRTY&&!SET_DIRTY&&EDIT===null) loadAll(); },5*60*1000);
+  window.addEventListener("beforeunload",e=>{ if(DIRTY||SET_DIRTY){ e.preventDefault(); e.returnValue=""; } });
 }
 const s=session(); if(s) boot(s.email); else $("email").focus();
 })();
@@ -494,5 +645,5 @@ const s=session(); if(s) boot(s.email); else $("email").focus();
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a36ae6388b3323f4',t:'MTc4ODY3MDcxMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a37989f0bc817d77',t:'MTc4ODgyNDIyMA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
