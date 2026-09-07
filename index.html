@@ -6,7 +6,7 @@
 <title>Aasiya Musalla — Regina, Saskatchewan</title>
 <meta name="description" content="Aasiya Musalla prayer times, iqamah schedule and community announcements — Regina, Saskatchewan.">
 <link rel="canonical" href="https://aasiyaregina.xubi.org/">
-<link rel="stylesheet" href="site.css?v=202609060130">
+<link rel="stylesheet" href="site.css?v=202609060200">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -112,18 +112,17 @@
     <div class="wrap">
       <div class="sec-head">
         <div><span class="kicker">Plan ahead</span><h2>Monthly timetable</h2></div>
-        <p>Adhan and iqamah times for the whole month. Print it for the fridge, or add the iqamah times to your phone’s calendar.</p>
+        <p>Adhan (begin) times for the whole month. Print it for the fridge, or add them to your phone’s calendar. Iqamah times are shown in today’s schedule above.</p>
       </div>
       <div class="mbar">
         <div class="mnav"><button class="btn btn-ghost btn-sm" id="mPrev" aria-label="Previous month">‹</button><b id="mTitle">—</b><button class="btn btn-ghost btn-sm" id="mNext" aria-label="Next month">›</button></div>
         <div class="mtools">
-          <label class="switch"><input type="checkbox" id="mIq" checked><span>Show iqamah</span></label>
           <button class="btn btn-ghost btn-sm" id="mIcs">Add to calendar (.ics)</button>
           <button class="btn btn-gold btn-sm" id="mPrint">Print</button>
         </div>
       </div>
       <div class="mwrap"><table class="mtable" id="mtable"></table></div>
-      <p class="mfoot">Times are for Regina, SK (ISNA). Maghrib begins at sunset; iqamah <span id="mgNote2">5</span> min later. Iqamah times may change — the display in the musalla is always authoritative.</p>
+      <p class="mfoot">Adhan times are for Regina, SK (ISNA). Maghrib begins at sunset. Iqamah times are posted in today’s schedule above and on the display in the musalla.</p>
     </div>
   </section>
 
@@ -288,7 +287,6 @@ function renderTable(){
   $("sunrise").textContent=A.fmtTime(DAY.sunrise); $("sunset").textContent=A.fmtTime(DAY.sunset);
   $("hijri").textContent=A.hijriText(DAY.hijri);
   $("mgNote").textContent=Math.round(A.CFG.maghribIqamahMinutes);
-  $("mgNote2").textContent=Math.round(A.CFG.maghribIqamahMinutes);
 }
 function annIcon(msg){
   const m=msg.toLowerCase();
@@ -386,7 +384,7 @@ let MV=null; // {y,m}
 function monthDays(y,m){ return new Date(Date.UTC(y,m,0)).getUTCDate(); }
 function renderMonth(){
   if(!MV){ const n=A.mosqueNow(); MV={y:n.y,m:n.m}; }
-  const {y,m}=MV, n=A.mosqueNow(), showIq=$("mIq").checked;
+  const {y,m}=MV, n=A.mosqueNow();
   $("mTitle").textContent=MONTHS[m-1]+" "+y;
   A.fetchAdhan(y,m).then(()=>{
     const N=monthDays(y,m), rows=[];
@@ -396,32 +394,31 @@ function renderMonth(){
       if(!hijriFirst) hijriFirst=A.hijriText(day.hijri); hijriLast=A.hijriText(day.hijri);
       const dt=new Date(Date.UTC(y,m-1,d)); const wd=dt.toLocaleDateString("en-CA",{weekday:"short",timeZone:"UTC"});
       const isToday=(y===n.y&&m===n.m&&d===n.d), past=(y*10000+m*100+d)<(n.y*10000+n.m*100+n.d);
-      const cell=p=>'<td><span class="b">'+A.fmtTime(p.begin).replace(/ [AP]M/,"")+'</span>'+(showIq?'<span class="i">'+(p.iq!=null?A.fmtTime(p.iq).replace(/ [AP]M/,""):(p.iqText||"—"))+'</span>':'')+'</td>';
+      const cell=p=>'<td><span class="b">'+A.fmtTime(p.begin).replace(/ [AP]M/,"")+'</span></td>';
       rows.push('<tr class="'+(isToday?"today":past?"past":"")+'"><th scope="row"><b>'+d+'</b><small>'+wd+'</small></th>'+
         cell(day.prayers[0])+'<td class="sr">'+A.fmtTime(day.sunrise).replace(/ [AP]M/,"")+'</td>'+
         day.prayers.slice(1).map(cell).join("")+'</tr>');
     }
     $("mtable").innerHTML='<thead><tr><th>Date</th><th>Fajr</th><th class="sr">Sunrise</th><th>Dhuhr</th><th>Asr</th><th>Maghrib</th><th>Isha</th></tr>'+
-      (showIq?'<tr class="legend"><th></th><th colspan="6"><span class="b">Adhan</span><span class="i">Iqamah</span></th></tr>':'')+'</thead><tbody>'+rows.join("")+'</tbody>';
+      '</thead><tbody>'+rows.join("")+'</tbody>';
     $("mTitle").title=hijriFirst+" – "+hijriLast;
     const t=$("mtable").querySelector("tr.today"); if(t && !renderMonth.scrolled){ renderMonth.scrolled=true; }
   }).catch(()=>{ $("mtable").innerHTML='<tbody><tr><td class="empty">Timetable unavailable right now.</td></tr></tbody>'; });
 }
 $("mPrev").onclick=()=>{ MV.m--; if(MV.m<1){MV.m=12;MV.y--;} renderMonth(); };
 $("mNext").onclick=()=>{ MV.m++; if(MV.m>12){MV.m=1;MV.y++;} renderMonth(); };
-$("mIq").onchange=renderMonth;
 $("mPrint").onclick=()=>window.print();
 $("mIcs").onclick=()=>{
-  const {y,m}=MV, N=monthDays(y,m), pad=A.pad2, L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Aasiya Musalla//Iqamah//EN","CALSCALE:GREGORIAN","X-WR-CALNAME:Aasiya Musalla iqamah — "+MONTHS[m-1]+" "+y,"X-WR-TIMEZONE:America/Regina"];
+  const {y,m}=MV, N=monthDays(y,m), pad=A.pad2, L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Aasiya Musalla//Adhan//EN","CALSCALE:GREGORIAN","X-WR-CALNAME:Aasiya Musalla adhan — "+MONTHS[m-1]+" "+y,"X-WR-TIMEZONE:America/Regina"];
   const stamp=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+Z/,"Z");
   for(let d=1; d<=N; d++){ const day=A.buildDay({y,m,d}); if(!day) continue;
-    day.prayers.forEach(p=>{ if(p.iq==null) return; const H=Math.floor(p.iq), M=Math.round((p.iq-H)*60);
+    day.prayers.forEach(p=>{ const H=Math.floor(p.begin), M=Math.round((p.begin-H)*60);
       const dt=y+pad(m)+pad(d)+"T"+pad(H)+pad(M)+"00";
       L.push("BEGIN:VEVENT","UID:"+dt+"-"+p.key+"@aasiyaregina.xubi.org","DTSTAMP:"+stamp,"DTSTART;TZID=America/Regina:"+dt,"DURATION:PT15M",
-        "SUMMARY:"+p.label+" iqamah — Aasiya Musalla","LOCATION:2 Sheppard Street\, Regina\, SK","DESCRIPTION:Adhan "+A.fmtTime(p.begin)+"\, iqamah "+A.fmtTime(p.iq),"END:VEVENT"); }); }
+        "SUMMARY:"+p.label+" adhan — Aasiya Musalla","LOCATION:2 Sheppard Street\, Regina\, SK","DESCRIPTION:"+p.label+" begins "+A.fmtTime(p.begin),"END:VEVENT"); }); }
   L.push("END:VCALENDAR");
   const blob=new Blob([L.join("\r\n")],{type:"text/calendar"}), a=document.createElement("a");
-  a.href=URL.createObjectURL(blob); a.download="aasiya-iqamah-"+y+"-"+pad(m)+".ics"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  a.href=URL.createObjectURL(blob); a.download="aasiya-adhan-"+y+"-"+pad(m)+".ics"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 };
 
 /* ---- scroll-spy + back-to-top ---- */
@@ -455,5 +452,5 @@ if("serviceWorker" in navigator && location.protocol==="https:") navigator.servi
 setInterval(tick,1000); setInterval(sync,5*60*1000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3791ca0cd205d34',t:'MTc4ODgxOTc0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3796a38b8bebe80',t:'MTc4ODgyMjkyMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
