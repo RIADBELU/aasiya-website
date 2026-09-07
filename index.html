@@ -6,10 +6,26 @@
 <title>Aasiya Musalla — Regina, Saskatchewan</title>
 <meta name="description" content="Aasiya Musalla prayer times, iqamah schedule and community announcements — Regina, Saskatchewan.">
 <link rel="canonical" href="https://aasiyaregina.xubi.org/">
-<link rel="stylesheet" href="site.css?v=202609052330">
+<link rel="stylesheet" href="site.css?v=202609060130">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b2e2a">
+<meta property="og:title" content="Aasiya Musalla — Regina, Saskatchewan">
+<meta property="og:description" content="Today's prayer and iqamah times, monthly timetable and announcements for Aasiya Musalla, 2 Sheppard Street, Regina.">
+<meta property="og:image" content="https://aasiyaregina.xubi.org/assets/hero.jpg">
+<meta property="og:url" content="https://aasiyaregina.xubi.org/">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Mosque","name":"Aasiya Musalla","url":"https://aasiyaregina.xubi.org/",
+ "image":"https://aasiyaregina.xubi.org/assets/hero.jpg",
+ "address":{"@type":"PostalAddress","streetAddress":"2 Sheppard Street","addressLocality":"Regina","addressRegion":"SK","addressCountry":"CA"},
+ "geo":{"@type":"GeoCoordinates","latitude":50.4452,"longitude":-104.6189},
+ "telephone":"+1-306-527-4199",
+ "contactPoint":[{"@type":"ContactPoint","name":"Waqar Ahsan","jobTitle":"Imam","telephone":"+1-306-527-4199","contactType":"Imam"},
+  {"@type":"ContactPoint","name":"Foyer Gulzer","telephone":"+1-306-201-5355","contactType":"General enquiries"},
+  {"@type":"ContactPoint","name":"Obaidul Haque Ripon","telephone":"+1-306-209-3949","contactType":"General enquiries"}]}
+</script>
 </head>
 <body>
 
@@ -22,6 +38,7 @@
     <nav class="nav" id="nav">
       <a href="#top" class="active">Home</a>
       <a href="#prayer">Prayer Times</a>
+      <a href="#month">Timetable</a>
       <a href="#announcements">Announcements</a>
       <a href="#visit">Visit</a>
       <a href="prayerdisplay.html" class="tvlink">TV Display</a>
@@ -61,10 +78,20 @@
         </div>
         <div class="now" id="pcNext" style="font-size:26px">—</div>
         <div class="iq" id="pcNextIq" style="margin-bottom:0">&nbsp;</div>
+        <div class="prog" id="prog" hidden><i></i></div>
         <div class="hijri"><span id="hijri">—</span><span id="greg">—</span></div>
       </aside>
     </div>
   </section>
+
+  <div class="ramadan" id="ramadan" hidden>
+    <div class="wrap">
+      <span class="rk">Ramadan Kareem</span>
+      <span>Suhoor ends <b id="rmFajr">—</b></span>
+      <span>Iftar <b id="rmIftar">—</b></span>
+      <span class="rcount">Iftar in <b id="rmCount">—</b></span>
+    </div>
+  </div>
 
   <section id="prayer">
     <div class="wrap">
@@ -81,13 +108,39 @@
     </div>
   </section>
 
-  <section id="announcements" class="alt">
+  <section id="month" class="alt">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="kicker">Plan ahead</span><h2>Monthly timetable</h2></div>
+        <p>Adhan and iqamah times for the whole month. Print it for the fridge, or add the iqamah times to your phone’s calendar.</p>
+      </div>
+      <div class="mbar">
+        <div class="mnav"><button class="btn btn-ghost btn-sm" id="mPrev" aria-label="Previous month">‹</button><b id="mTitle">—</b><button class="btn btn-ghost btn-sm" id="mNext" aria-label="Next month">›</button></div>
+        <div class="mtools">
+          <label class="switch"><input type="checkbox" id="mIq" checked><span>Show iqamah</span></label>
+          <button class="btn btn-ghost btn-sm" id="mIcs">Add to calendar (.ics)</button>
+          <button class="btn btn-gold btn-sm" id="mPrint">Print</button>
+        </div>
+      </div>
+      <div class="mwrap"><table class="mtable" id="mtable"></table></div>
+      <p class="mfoot">Times are for Regina, SK (ISNA). Maghrib begins at sunset; iqamah <span id="mgNote2">5</span> min later. Iqamah times may change — the display in the musalla is always authoritative.</p>
+    </div>
+  </section>
+
+  <section id="announcements">
     <div class="wrap">
       <div class="sec-head">
         <div><span class="kicker">Community</span><h2>Announcements</h2></div>
         <p>Notices, classes and events — the same messages that scroll across the TV display in the musalla.</p>
       </div>
-      <div class="alist" id="alist"><div class="empty">Loading…</div></div>
+      <div class="aboard">
+        <div class="alist" id="alist"><div class="empty">Loading…</div></div>
+        <aside class="aside">
+          <div class="asum"><b id="aCount">0</b><span>active notices</span></div>
+          <p class="asum-hint" id="aHint">Announcements are managed by the caretakers and shown on the TV display in the musalla at the same time.</p>
+          <a class="btn btn-ghost btn-sm tvlink" href="prayerdisplay.html">See the TV display</a>
+        </aside>
+      </div>
     </div>
   </section>
 
@@ -97,22 +150,49 @@
         <div><span class="kicker">Visit us</span><h2>Everyone is welcome</h2></div>
         <p>Please arrive a few minutes before iqamah, silence your phone, and make yourself at home.</p>
       </div>
-      <div class="grid3">
-        <div class="info">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
-          <h3>Location</h3>
-          <p id="locText">Regina, Saskatchewan</p>
+      <div class="vgrid">
+        <div class="map">
+          <iframe title="Map to Aasiya Musalla" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen
+            src="https://www.google.com/maps?q=2+Sheppard+Street,+Regina,+SK,+Canada&z=15&output=embed"></iframe>
         </div>
-        <div class="info">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
-          <h3>Daily prayers</h3>
-          <p>Five daily congregational prayers. Iqamah times change with the season — check the schedule above before you come.</p>
+        <div class="vside">
+          <div class="info">
+            <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+            <h3>Location</h3>
+            <p><b>2 Sheppard Street</b><br>Regina, Saskatchewan, Canada</p>
+            <div class="ilinks">
+              <a class="btn btn-gold btn-sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=2+Sheppard+Street,+Regina,+SK,+Canada">Get directions</a>
+              <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="https://maps.apple.com/?daddr=2+Sheppard+Street,+Regina,+SK,+Canada">Apple Maps</a>
+            </div>
+          </div>
+          <div class="info">
+            <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+            <h3>Daily prayers</h3>
+            <p>Five daily congregational prayers, every day of the year. Iqamah times change with the season — check the schedule above before you come, and please arrive a few minutes early.</p>
+          </div>
         </div>
-        <div class="info">
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 10-3 6.2L21 20l-1.6-3.4A8 8 0 0020 12z"/></svg></div>
-          <h3>Get in touch</h3>
-          <p>For questions or to support the musalla, please speak with the caretakers after any prayer.</p>
-        </div>
+      </div>
+
+      <div class="sec-head sub" id="contact">
+        <div><span class="kicker">Contact</span><h2>Get in touch</h2></div>
+        <p>For questions, to support the musalla, or for anything else — call or text any of the brothers below.</p>
+      </div>
+      <div class="grid3 people">
+        <a class="person" href="tel:+13065274199">
+          <span class="av">WA</span>
+          <span class="who"><b>Waqar Ahsan</b><small>Imam</small></span>
+          <span class="tel">+1 306 527 4199</span>
+        </a>
+        <a class="person" href="tel:+13062015355">
+          <span class="av">FG</span>
+          <span class="who"><b>Foyer Gulzer</b><small>Musalla contact</small></span>
+          <span class="tel">+1 306 201 5355</span>
+        </a>
+        <a class="person" href="tel:+13062093949">
+          <span class="av">OR</span>
+          <span class="who"><b>Obaidul Haque Ripon</b><small>Musalla contact</small></span>
+          <span class="tel">+1 306 209 3949</span>
+        </a>
       </div>
       <div class="cta">
         <div><h3>Watch the live prayer display</h3><p>The same screen that runs on the TV in the musalla — adhan, iqamah, countdown and announcements, in real time.</p></div>
@@ -154,8 +234,9 @@
         <img src="assets/mark.png" alt="" width="52" height="40">
         <div><b>Aasiya Musalla</b><span>Regina, Saskatchewan</span></div>
         <p>A small place of prayer serving the community of Regina. Uniting our Ummah with Allah, peacefully.</p>
+        <p class="faddr">2 Sheppard Street, Regina, SK · <a href="tel:+13065274199">+1 306 527 4199</a></p>
       </div>
-      <div class="fcol"><b>Site</b><a href="#prayer">Prayer Times</a><a href="#announcements">Announcements</a><a href="#visit">Visit</a></div>
+      <div class="fcol"><b>Site</b><a href="#prayer">Prayer Times</a><a href="#month">Monthly timetable</a><a href="#announcements">Announcements</a><a href="#visit">Visit</a><a href="#contact">Contact</a></div>
       <div class="fcol"><b>Tools</b><a href="prayerdisplay.html" class="tvlink">TV Display</a><a href="admin.html">Admin</a></div>
     </div>
     <div class="fbottom">
@@ -164,6 +245,7 @@
     </div>
   </div>
 </footer>
+<button class="totop" id="toTop" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <script src="site.js?v=202609050548"></script>
 <script>
@@ -200,19 +282,57 @@ function renderTable(){
   if(!DAY){ $("ptable").innerHTML=""; return; }
   const n=A.mosqueNow(), fi=A.focusIndex(DAY,n.hours);
   $("ptable").innerHTML=DAY.prayers.map((p,i)=>
-    '<div class="p'+(i===fi?" current":"")+'"><div class="name">'+p.label+'</div><div class="ar">'+p.ar+'</div>'+
+    '<div class="p'+(i===fi?" current":(fi===-1||i<fi)?" passed":" soon")+'"><div class="name">'+p.label+'</div><div class="ar">'+p.ar+'</div>'+
     '<div class="times"><div><span class="t">Begins</span><span class="v">'+A.fmtTime(p.begin)+'</span></div>'+
     '<div><span class="t">Iqamah</span><span class="v iq">'+(p.iq!=null?A.fmtTime(p.iq):(p.iqText||"—"))+'</span></div></div></div>').join("");
   $("sunrise").textContent=A.fmtTime(DAY.sunrise); $("sunset").textContent=A.fmtTime(DAY.sunset);
   $("hijri").textContent=A.hijriText(DAY.hijri);
   $("mgNote").textContent=Math.round(A.CFG.maghribIqamahMinutes);
-  $("locText").textContent=A.CFG.location;
+  $("mgNote2").textContent=Math.round(A.CFG.maghribIqamahMinutes);
+}
+function annIcon(msg){
+  const m=msg.toLowerCase();
+  const P=[[/phone|silence|mobile/,'<path d="M7 3h10a1 1 0 011 1v16a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M11 18h2"/>'],
+    [/halaqa|class|lesson|quran|qur|tafsir|study|lecture|dars/,'<path d="M4 19V5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19a2 2 0 002 2h13"/><path d="M9 7h6M9 11h4"/>'],
+    [/clean|tidy|mess|shoes/,'<path d="M3 21l6-6M14 4l6 6-9 9-6-6z"/><path d="M10 8l6 6"/>'],
+    [/child|kid|parent|family/,'<circle cx="9" cy="7" r="3"/><circle cx="17" cy="9" r="2"/><path d="M3 21v-2a5 5 0 015-5h2a5 5 0 015 5v2M15 21v-1a3 3 0 013-3h1a2 2 0 012 2v2"/>'],
+    [/donat|support|sadaq|zakat|fund|jazak|thank/,'<path d="M12 21s-7-4.6-7-10a4 4 0 017-2.6A4 4 0 0119 11c0 5.4-7 10-7 10z"/>'],
+    [/eid|ramadan|iftar|taraw|suhoor|moon/,'<path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/>'],
+    [/jumu|friday|khutba/,'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>'],
+    [/park|car|vehicle|snow|road/,'<path d="M5 17h14l1-6-2-5H6L4 11z"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/>']];
+  for(const [re,svg] of P) if(re.test(m)) return svg;
+  return '<path d="M3 11l14-5v12L3 13z"/><path d="M7 13v5a2 2 0 004 0v-3"/>';
 }
 function renderAnnouncements(){
-  const list=A.activeAnnouncements(A.mosqueNow());
-  $("alist").innerHTML=list.length? list.map(a=>'<div class="ann"><i></i><div><p>'+esc(a.message)+'</p>'+(a.endRaw?'<div class="when">Until '+esc(a.endRaw)+'</div>':'')+'</div></div>').join("")
-    : '<div class="empty">No announcements right now.</div>';
+  const n=A.mosqueNow(), today=n.y*10000+n.m*100+n.d;
+  let list=A.activeAnnouncements(n);
+  // newest first (by start date), undated last
+  list=list.map((a,i)=>Object.assign({i},a)).sort((a,b)=>(b.start||0)-(a.start||0)||a.i-b.i);
+  $("aCount").textContent=list.length;
+  if(!list.length){
+    $("alist").innerHTML='<div class="empty aempty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l14-5v12L3 13z"/><path d="M7 13v5a2 2 0 004 0v-3"/></svg><b>All quiet for now</b><span>No announcements at the moment — check back soon, or watch the ticker on the TV display.</span></div>';
+    const c0=document.querySelector('#nav a[href="#announcements"]'); if(c0) c0.dataset.count=""; return;
+  }
+  const fmtD=k=>{ if(k===null) return ""; const d=new Date(Date.UTC(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100)); return d.toLocaleDateString("en-CA",{month:"short",day:"numeric",timeZone:"UTC"}); };
+  $("alist").innerHTML=list.map((a,idx)=>{
+    const fresh=a.start!==null && daysBetween(a.start,today)<=3;
+    let status="", cls="";
+    if(a.end!==null){ const dl=daysBetween(today,a.end); if(dl===0){status="Last day today";cls="urgent";} else if(dl===1){status="Ends tomorrow";cls="urgent";} else if(dl<=7){status="Ends in "+dl+" days";cls="soon";} }
+    const range=(a.start!==null||a.end!==null)? (a.start!==null?fmtD(a.start):"")+(a.start!==null&&a.end!==null?" – ":"")+(a.end!==null?fmtD(a.end):(a.start!==null?" onwards":"")) : "Ongoing";
+    const feat=idx===0&&list.length>1;
+    return '<article class="ann'+(feat?" feat":"")+(fresh?" fresh":"")+'">'+
+      '<div class="aic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+annIcon(a.message)+'</svg></div>'+
+      '<div class="abody">'+
+        '<div class="ameta">'+(feat?'<span class="tag pin">Latest</span>':'')+(fresh?'<span class="tag new">New</span>':'')+(status?'<span class="tag '+cls+'">'+status+'</span>':'')+'<span class="range">'+range+'</span></div>'+
+        '<p>'+esc(a.message)+'</p>'+
+        '<div class="aacts"><button type="button" class="alink" data-share="'+idx+'">Share</button><button type="button" class="alink" data-copy="'+idx+'">Copy</button></div>'+
+      '</div></article>';
+  }).join("");
+  $("alist").querySelectorAll("[data-copy]").forEach(b=>b.onclick=()=>{ navigator.clipboard?.writeText(list[+b.dataset.copy].message).then(()=>{ b.textContent="Copied ✓"; setTimeout(()=>b.textContent="Copy",1500); }); });
+  $("alist").querySelectorAll("[data-share]").forEach(b=>b.onclick=()=>{ const t=list[+b.dataset.share].message; if(navigator.share) navigator.share({title:"Aasiya Musalla",text:t,url:location.origin+location.pathname+"#announcements"}).catch(()=>{}); else { navigator.clipboard?.writeText(t+" — "+location.href.split("#")[0]+"#announcements"); b.textContent="Link copied ✓"; setTimeout(()=>b.textContent="Share",1500); } });
+  const cnt=document.querySelector('#nav a[href="#announcements"]'); if(cnt) cnt.dataset.count=list.length||"";
 }
+function daysBetween(k1,k2){ const d=k=>Date.UTC(Math.floor(k/10000),Math.floor(k/100)%100-1,k%100); return Math.round((d(k2)-d(k1))/864e5); }
 function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
 function tick(){
@@ -240,25 +360,100 @@ function tick(){
     $("pcNext").textContent=next.label; $("pcNextIq").innerHTML="Adhan <b>"+A.fmtTime(next.begin)+"</b> · Iqamah <b>"+(next.iq!=null?A.fmtTime(next.iq):(next.iqText||"—"))+"</b>";
     let secs=Math.max(0,Math.round((nextH-n.hours)*3600));
     $("cH").textContent=A.pad2(Math.floor(secs/3600)); $("cM").textContent=A.pad2(Math.floor(secs%3600/60)); $("cS").textContent=A.pad2(secs%60); }
+  // progress bar: adhan → iqamah of the current prayer
+  const pr=$("prog");
+  if(fi>=0 && cur.iq!=null && n.hours>=cur.begin && n.hours<cur.iq){ pr.hidden=false; pr.firstElementChild.style.width=Math.min(100,(n.hours-cur.begin)/(cur.iq-cur.begin)*100)+"%"; }
+  else pr.hidden=true;
+  ramadan(n);
   // move the "Now" badge when focus changes
   const curEl=document.querySelector("#ptable .p.current"); const idx=curEl?[...curEl.parentNode.children].indexOf(curEl):-2;
   if(idx!==fi) renderTable();
 }
+function ramadan(n){
+  const box=$("ramadan"); const h=DAY&&DAY.hijri; const isR=h && +h.month.number===9;
+  box.hidden=!isR; if(!isR) return;
+  const f=DAY.prayers[0].begin, m=DAY.prayers[3].begin;
+  $("rmFajr").textContent=A.fmtTime(f); $("rmIftar").textContent=A.fmtTime(m);
+  let secs=Math.round((m-n.hours)*3600), txt;
+  if(secs<=0){ txt= TOMORROW? "tomorrow at "+A.fmtTime(TOMORROW.prayers[3].begin):"—"; }
+  else txt=Math.floor(secs/3600)+"h "+A.pad2(Math.floor(secs%3600/60))+"m";
+  $("rmCount").textContent=txt;
+}
+
+/* ---- Monthly timetable ---- */
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+let MV=null; // {y,m}
+function monthDays(y,m){ return new Date(Date.UTC(y,m,0)).getUTCDate(); }
+function renderMonth(){
+  if(!MV){ const n=A.mosqueNow(); MV={y:n.y,m:n.m}; }
+  const {y,m}=MV, n=A.mosqueNow(), showIq=$("mIq").checked;
+  $("mTitle").textContent=MONTHS[m-1]+" "+y;
+  A.fetchAdhan(y,m).then(()=>{
+    const N=monthDays(y,m), rows=[];
+    let hijriFirst="",hijriLast="";
+    for(let d=1; d<=N; d++){
+      const day=A.buildDay({y,m,d}); if(!day) continue;
+      if(!hijriFirst) hijriFirst=A.hijriText(day.hijri); hijriLast=A.hijriText(day.hijri);
+      const dt=new Date(Date.UTC(y,m-1,d)); const wd=dt.toLocaleDateString("en-CA",{weekday:"short",timeZone:"UTC"});
+      const isToday=(y===n.y&&m===n.m&&d===n.d), past=(y*10000+m*100+d)<(n.y*10000+n.m*100+n.d);
+      const cell=p=>'<td><span class="b">'+A.fmtTime(p.begin).replace(/ [AP]M/,"")+'</span>'+(showIq?'<span class="i">'+(p.iq!=null?A.fmtTime(p.iq).replace(/ [AP]M/,""):(p.iqText||"—"))+'</span>':'')+'</td>';
+      rows.push('<tr class="'+(isToday?"today":past?"past":"")+'"><th scope="row"><b>'+d+'</b><small>'+wd+'</small></th>'+
+        cell(day.prayers[0])+'<td class="sr">'+A.fmtTime(day.sunrise).replace(/ [AP]M/,"")+'</td>'+
+        day.prayers.slice(1).map(cell).join("")+'</tr>');
+    }
+    $("mtable").innerHTML='<thead><tr><th>Date</th><th>Fajr</th><th class="sr">Sunrise</th><th>Dhuhr</th><th>Asr</th><th>Maghrib</th><th>Isha</th></tr>'+
+      (showIq?'<tr class="legend"><th></th><th colspan="6"><span class="b">Adhan</span><span class="i">Iqamah</span></th></tr>':'')+'</thead><tbody>'+rows.join("")+'</tbody>';
+    $("mTitle").title=hijriFirst+" – "+hijriLast;
+    const t=$("mtable").querySelector("tr.today"); if(t && !renderMonth.scrolled){ renderMonth.scrolled=true; }
+  }).catch(()=>{ $("mtable").innerHTML='<tbody><tr><td class="empty">Timetable unavailable right now.</td></tr></tbody>'; });
+}
+$("mPrev").onclick=()=>{ MV.m--; if(MV.m<1){MV.m=12;MV.y--;} renderMonth(); };
+$("mNext").onclick=()=>{ MV.m++; if(MV.m>12){MV.m=1;MV.y++;} renderMonth(); };
+$("mIq").onchange=renderMonth;
+$("mPrint").onclick=()=>window.print();
+$("mIcs").onclick=()=>{
+  const {y,m}=MV, N=monthDays(y,m), pad=A.pad2, L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Aasiya Musalla//Iqamah//EN","CALSCALE:GREGORIAN","X-WR-CALNAME:Aasiya Musalla iqamah — "+MONTHS[m-1]+" "+y,"X-WR-TIMEZONE:America/Regina"];
+  const stamp=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+Z/,"Z");
+  for(let d=1; d<=N; d++){ const day=A.buildDay({y,m,d}); if(!day) continue;
+    day.prayers.forEach(p=>{ if(p.iq==null) return; const H=Math.floor(p.iq), M=Math.round((p.iq-H)*60);
+      const dt=y+pad(m)+pad(d)+"T"+pad(H)+pad(M)+"00";
+      L.push("BEGIN:VEVENT","UID:"+dt+"-"+p.key+"@aasiyaregina.xubi.org","DTSTAMP:"+stamp,"DTSTART;TZID=America/Regina:"+dt,"DURATION:PT15M",
+        "SUMMARY:"+p.label+" iqamah — Aasiya Musalla","LOCATION:2 Sheppard Street\, Regina\, SK","DESCRIPTION:Adhan "+A.fmtTime(p.begin)+"\, iqamah "+A.fmtTime(p.iq),"END:VEVENT"); }); }
+  L.push("END:VCALENDAR");
+  const blob=new Blob([L.join("\r\n")],{type:"text/calendar"}), a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="aasiya-iqamah-"+y+"-"+pad(m)+".ics"; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+};
+
+/* ---- scroll-spy + back-to-top ---- */
+(function(){
+  const links=[...document.querySelectorAll('#nav a[href^="#"]')], secs=links.map(a=>document.querySelector(a.getAttribute("href"))).filter(Boolean);
+  const top=$("toTop");
+  function spy(){
+    const yy=scrollY+120; let act=secs[0];
+    secs.forEach(sc=>{ if(sc.offsetTop<=yy) act=sc; });
+    links.forEach(a=>a.classList.toggle("active",a.getAttribute("href")==="#"+act.id));
+    top.classList.toggle("show",scrollY>600);
+  }
+  addEventListener("scroll",spy,{passive:true}); spy();
+  top.onclick=()=>scrollTo({top:0,behavior:"smooth"});
+})();
 function ensureAdhan(n){
   const nm=n.m===12?{y:n.y+1,m:1}:{y:n.y,m:n.m+1};
   Promise.all([A.fetchAdhan(n.y,n.m),A.fetchAdhan(nm.y,nm.m)]).then(()=>{
     if(!DAY){ DAY=A.buildDay(n); DAYKEY=DAY?n.y+"-"+n.m+"-"+n.d:""; renderTable(); }
+    renderMonth();
     // tomorrow (for after-Isha countdown)
     const d=new Date(Date.UTC(n.y,n.m-1,n.d+1)); TOMORROW=A.buildDay({y:d.getUTCFullYear(),m:d.getUTCMonth()+1,d:d.getUTCDate()});
   }).catch(()=>setStatus("err","Prayer times unavailable"));
 }
 function sync(){
-  A.fetchSheet().then(()=>{ DAYKEY=""; tick(); setStatus("live","Live · updated "+new Date().toLocaleTimeString("en-CA",{timeZone:"America/Regina",hour:"numeric",minute:"2-digit"})); })
+  A.fetchSheet().then(()=>{ DAYKEY=""; tick(); renderMonth(); setStatus("live","Live · updated "+new Date().toLocaleTimeString("en-CA",{timeZone:"America/Regina",hour:"numeric",minute:"2-digit"})); })
     .catch(()=>{ renderAnnouncements(); setStatus("err","Showing last saved schedule"); });
 }
 A.applySettings(); ensureAdhan(A.mosqueNow()); sync(); tick();
+if("serviceWorker" in navigator && location.protocol==="https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
 setInterval(tick,1000); setInterval(sync,5*60*1000);
 })();
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3791ca0cd205d34',t:'MTc4ODgxOTc0Mg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
