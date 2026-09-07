@@ -20,8 +20,8 @@ body.adm .brand{color:#fff}
 
 /* ---------- console frame ---------- */
 .console{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-.side{background:linear-gradient(180deg,var(--green-2),var(--green));color:#fff;padding:22px 18px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;min-height:100%}
-.console .side{align-self:stretch}
+.side{background:linear-gradient(180deg,var(--green-2),var(--green));color:#fff;padding:22px 18px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;min-height:0}
+.console .side{align-self:start}
 .side .brand{padding:4px 8px 22px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:14px}
 .sidenav{display:flex;flex-direction:column;gap:4px}
 .sidenav a{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;font-weight:600;font-size:15px;opacity:.82;transition:.15s}
@@ -239,7 +239,7 @@ html[data-theme="dark"] .toast{background:var(--gold);color:var(--green-2)}
    admin v3 — responsive shell + display settings
    ===================================================================== */
 /* sidebar fits any screen height: scrollable nav, footer pinned */
-.side{height:100vh;height:100dvh;overflow:hidden;padding:18px 16px}
+.side{height:100vh;height:100dvh;max-height:100dvh;min-height:0;align-self:start;overflow:hidden;padding:18px 16px}
 .side .brand{flex:none}
 .sidenav{flex:1 1 auto;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent;padding-right:2px}
 .side-foot{flex:none;padding-top:12px}
