@@ -232,3 +232,160 @@ textarea{min-height:96px;resize:vertical}
 .choice:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(0,0,0,.18);border-color:var(--gold)}
 html[data-theme="dark"] .choice{background:#0f1c1a}html[data-theme="dark"] .choice span{color:var(--gold)}
 @media (max-width:640px){.modal-choose{padding:20px}.choose-grid{gap:10px}.choice img{aspect-ratio:3/4}.choice span{font-size:13px;padding:9px}}
+
+/* ===================== homepage v2 ===================== */
+/* nav: announcement count badge */
+#nav a[data-count]:not([data-count=""])::after{content:attr(data-count);display:inline-block;margin-left:6px;min-width:18px;padding:0 5px;border-radius:99px;background:var(--gold);color:#1a1a1a;font-size:11px;font-weight:800;line-height:18px;text-align:center;vertical-align:1px}
+
+/* hero card progress bar */
+.prog{height:6px;border-radius:99px;background:var(--paper);border:1px solid var(--line);overflow:hidden;margin-top:12px}
+.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green-3),var(--gold));transition:width 1s linear}
+.prog[hidden]{display:none}
+
+/* ramadan strip */
+.ramadan{background:linear-gradient(90deg,#1a2a24,var(--green-2));color:#fff;border-bottom:1px solid rgba(201,165,74,.35)}
+.ramadan .wrap{display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding-top:14px;padding-bottom:14px;font-size:15px}
+.ramadan .rk{font-weight:800;color:var(--gold-2);letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+.ramadan b{color:var(--gold-2);margin-left:4px}
+.ramadan .rcount{margin-left:auto}
+.ramadan[hidden]{display:none}
+
+/* prayer cards: passed / soon */
+.ptable .p.passed{opacity:.62}
+.ptable .p.passed .name{color:var(--muted)}
+.ptable .p.passed .v.iq{color:var(--muted)}
+.ptable .p.passed::after{content:"Done";position:absolute;top:14px;right:14px;background:var(--line);color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border-radius:99px}
+.ptable .p:hover{opacity:1}
+
+/* announcements: fresh */
+.ann.fresh{border-color:rgba(201,165,74,.7);background:linear-gradient(180deg,#fffcf3,var(--paper))}
+.ann .when .new{display:inline-block;background:var(--gold);color:#1a1a1a;border-radius:99px;padding:2px 8px;margin-right:8px;font-size:10px}
+html[data-theme="dark"] .ann.fresh{background:linear-gradient(180deg,#1a2a24,#0f1c1a)}
+
+/* monthly timetable */
+.mbar{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.mnav{display:flex;align-items:center;gap:12px}
+.mnav b{font-size:20px;color:var(--green-2);min-width:190px;text-align:center;letter-spacing:-.01em}
+.mnav .btn{padding:6px 14px;font-size:18px;line-height:1}
+.mtools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.switch{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;user-select:none}
+.switch input{width:16px;height:16px;accent-color:var(--green)}
+.mwrap{overflow:auto;border:1px solid var(--line);border-radius:18px;background:var(--card);max-height:640px}
+.mtable{width:100%;border-collapse:separate;border-spacing:0;font-variant-numeric:tabular-nums;font-size:15px}
+.mtable thead th{position:sticky;top:0;z-index:2;background:var(--green-2);color:#fff;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:14px 10px;text-align:center;font-weight:700}
+.mtable thead tr.legend th{top:44px;background:var(--paper);color:var(--muted);padding:6px 10px;font-size:11px;letter-spacing:.06em;text-transform:none;border-bottom:1px solid var(--line)}
+.mtable thead tr.legend .b,.mtable thead tr.legend .i{display:inline-block;margin:0 10px}
+.mtable thead tr.legend .b::before,.mtable thead tr.legend .i::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:var(--muted)}
+.mtable thead tr.legend .i::before{background:var(--green)}
+.mtable th:first-child,.mtable td:first-child{text-align:left;padding-left:18px}
+.mtable tbody th{padding:10px 10px 10px 18px;text-align:left;font-weight:600;color:var(--ink);white-space:nowrap;border-bottom:1px solid var(--line)}
+.mtable tbody th b{font-size:16px;margin-right:8px;color:var(--green-2)}
+.mtable tbody th small{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.mtable td{padding:8px 10px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+.mtable td .b{display:block;color:var(--muted);font-size:13px;line-height:1.2}
+.mtable td .i{display:block;color:var(--green);font-weight:800;font-size:16px;line-height:1.25}
+.mtable td.sr{color:var(--muted);font-size:13px}
+.mtable tr.past{opacity:.5}
+.mtable tr.today th,.mtable tr.today td{background:#fff8e6;border-top:2px solid var(--gold);border-bottom:2px solid var(--gold)}
+.mtable tr.today th b{color:var(--gold)}
+.mfoot{margin:14px 4px 0;font-size:13px;color:var(--muted)}
+html[data-theme="dark"] .mtable tr.today th,html[data-theme="dark"] .mtable tr.today td{background:#1f2a1a}
+html[data-theme="dark"] .mtable thead tr.legend th{background:#0f1c1a}
+html[data-theme="dark"] .mtable tbody th,html[data-theme="dark"] .mtable tbody th b{color:var(--ink)}
+html[data-theme="dark"] .mtable td .i{color:var(--gold-2)}
+html[data-theme="dark"] .mnav b{color:var(--ink)}
+
+/* visit: map + side cards */
+.vgrid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-bottom:64px}
+.map{border-radius:18px;overflow:hidden;border:1px solid var(--line);min-height:380px;background:var(--paper);position:relative}
+.map iframe{position:absolute;inset:0;width:100%;height:100%;border:0;filter:saturate(.85)}
+html[data-theme="dark"] .map iframe{filter:invert(.9) hue-rotate(180deg) saturate(.7) brightness(.9)}
+.vside{display:grid;gap:16px}
+.info p b{color:var(--ink);font-size:17px}
+.ilinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.sec-head.sub{margin-top:0}
+.people .person{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:4px 16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 24px;text-decoration:none;color:var(--ink);transition:.2s}
+.people .person:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(20,40,36,.08);border-color:rgba(201,165,74,.6)}
+.person .av{grid-row:1/3;width:52px;height:52px;border-radius:50%;background:linear-gradient(180deg,var(--green-3),var(--green));color:var(--gold-2);display:grid;place-items:center;font-weight:800;letter-spacing:.04em}
+.person .who b{display:block;font-size:17px;color:var(--green-2)}
+.person .who small{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-top:2px}
+.person .tel{font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
+.person .tel::before{content:"☏ ";opacity:.6}
+html[data-theme="dark"] .people .person{background:var(--card)}html[data-theme="dark"] .person .who b{color:var(--ink)}html[data-theme="dark"] .person .tel{color:var(--gold-2)}
+.faddr a{color:inherit}
+
+/* back to top */
+.totop{position:fixed;right:22px;bottom:22px;z-index:50;width:46px;height:46px;border-radius:50%;border:0;background:var(--green);color:#fff;box-shadow:0 10px 30px rgba(0,0,0,.25);cursor:pointer;display:grid;place-items:center;opacity:0;transform:translateY(12px);pointer-events:none;transition:.25s}
+.totop.show{opacity:1;transform:none;pointer-events:auto}
+.totop svg{width:20px;height:20px}
+.totop:hover{background:var(--green-3)}
+
+@media (max-width:900px){
+  .vgrid{grid-template-columns:1fr}.map{min-height:280px}
+  .mnav b{min-width:0}
+  .mtable{font-size:12px}.mtable td .i{font-size:13px}.mtable th.sr,.mtable td.sr{display:none}.mtable td{padding:7px 4px}.mtable thead th{padding:12px 4px;font-size:10px;letter-spacing:.08em}.mtable tbody th{padding:7px 4px 7px 10px}.mtable tbody th b{font-size:14px;margin-right:4px}.mtable tbody th small{font-size:10px}.mtable th:first-child,.mtable td:first-child{padding-left:10px}
+  .ramadan .rcount{margin-left:0}
+}
+
+/* print: just the month timetable */
+@media print{
+  header,footer,.hero,.ramadan,#prayer,#announcements,#visit,.mtools,.mnav .btn,.totop,.modal{display:none!important}
+  body{background:#fff;color:#000}
+  section{padding:0}
+  .sec-head{margin-bottom:12px}.sec-head p{display:none}
+  .mwrap{max-height:none;overflow:visible;border:0}
+  .mtable thead th{position:static;background:#0b2e2a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .mtable tr.past{opacity:1}
+  .mtable td .i{color:#000}
+  .mfoot{margin-top:10px}
+}
+
+/* ===================== announcements v2 (notice board) ===================== */
+.aboard{display:grid;grid-template-columns:1fr 280px;gap:24px;align-items:start}
+.alist{display:grid;grid-template-columns:1fr;gap:14px}
+.ann{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 24px;transition:.2s;position:relative;overflow:hidden}
+.ann::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--line);transition:.2s}
+.ann:hover{border-color:rgba(201,165,74,.6);transform:translateY(-2px);box-shadow:0 14px 34px rgba(20,40,36,.08)}
+.ann:hover::before{background:var(--gold)}
+.ann i{display:none}
+.aic{width:46px;height:46px;border-radius:13px;background:var(--paper);border:1px solid var(--line);color:var(--green);display:grid;place-items:center;flex:none}
+.aic svg{width:22px;height:22px}
+.abody{min-width:0}
+.ameta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:99px;background:var(--paper);color:var(--muted);border:1px solid var(--line)}
+.tag.new{background:var(--gold);color:#1a1a1a;border-color:transparent}
+.tag.pin{background:var(--green);color:#fff;border-color:transparent}
+.tag.soon{background:#fff4d6;color:#8a6a10;border-color:#f0d99a}
+.tag.urgent{background:#fde8e6;color:#a23b30;border-color:#f3c1bb}
+.range{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.ann p{margin:0;font-size:16px;line-height:1.6;color:var(--ink)}
+.ann .when{display:none}
+.aacts{display:flex;gap:14px;margin-top:12px;opacity:0;transition:.2s}
+.ann:hover .aacts,.ann:focus-within .aacts{opacity:1}
+.alink{background:none;border:0;padding:0;font:inherit;font-size:13px;font-weight:700;color:var(--green);cursor:pointer;letter-spacing:.02em}
+.alink:hover{text-decoration:underline}
+.ann.feat{background:linear-gradient(135deg,var(--green-2),var(--green-3));border-color:transparent;color:#fff;padding:28px}
+.ann.feat::before{background:var(--gold)}
+.ann.feat .aic{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.18);color:var(--gold-2)}
+.ann.feat p{color:#fff;font-size:19px;font-weight:600;line-height:1.5}
+.ann.feat .range{color:rgba(255,255,255,.7)}
+.ann.feat .tag{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.2)}
+.ann.feat .tag.pin,.ann.feat .tag.new{background:var(--gold);color:#1a1a1a}
+.ann.feat .alink{color:var(--gold-2)}
+.ann.fresh:not(.feat){border-color:rgba(201,165,74,.55)}
+.aside{position:sticky;top:96px;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:24px}
+.asum b{display:block;font-size:44px;font-weight:800;color:var(--green-2);line-height:1;letter-spacing:-.02em}
+.asum span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.asum-hint{font-size:14px;color:var(--muted);line-height:1.6;margin:14px 0 18px}
+.aempty{display:grid;justify-items:center;gap:8px;padding:56px 24px}
+.aempty svg{width:40px;height:40px;color:var(--gold);margin-bottom:6px}
+.aempty b{font-size:18px;color:var(--green-2)}
+.aempty span{max-width:380px;line-height:1.6}
+html[data-theme="dark"] .ann{background:var(--card)}
+html[data-theme="dark"] .aic{background:#0f1c1a}
+html[data-theme="dark"] .aside{background:#0f1c1a}
+html[data-theme="dark"] .asum b{color:var(--ink)}
+html[data-theme="dark"] .tag{background:#0f1c1a}
+html[data-theme="dark"] .ann.fresh:not(.feat){background:var(--card)}
+@media (max-width:900px){.aboard{grid-template-columns:1fr}.aside{position:static}.aacts{opacity:1}.ann{padding:18px}.ann.feat{padding:22px}.ann.feat p{font-size:17px}}
+@media (hover:none){.aacts{opacity:1}}
