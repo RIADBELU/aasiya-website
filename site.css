@@ -389,3 +389,8 @@ html[data-theme="dark"] .tag{background:#0f1c1a}
 html[data-theme="dark"] .ann.fresh:not(.feat){background:var(--card)}
 @media (max-width:900px){.aboard{grid-template-columns:1fr}.aside{position:static}.aacts{opacity:1}.ann{padding:18px}.ann.feat{padding:22px}.ann.feat p{font-size:17px}}
 @media (hover:none){.aacts{opacity:1}}
+
+/* ---- monthly timetable: adhan only ---- */
+.mtable td .b{display:block;color:var(--ink);font-weight:800;font-size:16px;line-height:1.25}
+html[data-theme="dark"] .mtable td .b{color:#f3efe4}
+@media (max-width:640px){ .mtable td .b{font-size:13px} }
