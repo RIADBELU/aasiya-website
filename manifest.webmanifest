@@ -1,0 +1,14 @@
+{
+  "name": "Aasiya Musalla — Prayer Times",
+  "short_name": "Aasiya Musalla",
+  "description": "Prayer and iqamah times, monthly timetable and announcements for Aasiya Musalla, Regina SK.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f3ec",
+  "theme_color": "#0b2e2a",
+  "icons": [
+    { "src": "assets/favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
