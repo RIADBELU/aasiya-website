@@ -6,7 +6,7 @@
 <title>Admin — Aasiya Musalla</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="site.css?v=202609050548">
-<link rel="stylesheet" href="admin.css?v=202609080110">
+<link rel="stylesheet" href="admin.css?v=202609080300">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -41,11 +41,11 @@
   <aside class="side">
     <a class="brand" href="index.html"><img src="assets/mark.png" alt="" width="44" height="34"><span>Aasiya Musalla<small>Admin</small></span></a>
     <nav class="sidenav">
-      <a href="#overview" data-view="overview" class="active"><i>◎</i><span class="nl">Overview</span><span class="ns">Overview</span></a>
-      <a href="#iqamah" data-view="iqamah"><i>◷</i><span class="nl">Iqamah schedule</span><span class="ns">Iqamah</span></a>
-      <a href="#announcements" data-view="announcements"><i>▤</i><span class="nl">Announcements</span><span class="ns">Notices</span><b class="cnt" id="navAnnCount"></b></a>
-      <a href="#display" data-view="display"><i>▣</i><span class="nl">Display settings</span><span class="ns">Display</span><b class="cnt" id="navSetCount"></b></a>
-      <a href="#sheet" data-view="sheet"><i>⌗</i><span class="nl">Data &amp; sheet</span><span class="ns">Data</span></a>
+      <a href="#overview" data-view="overview" class="active"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></i><span class="nl">Overview</span><span class="ns">Overview</span></a>
+      <a href="#iqamah" data-view="iqamah"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><span class="nl">Iqamah schedule</span><span class="ns">Iqamah</span></a>
+      <a href="#announcements" data-view="announcements"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></svg></i><span class="nl">Announcements</span><span class="ns">Notices</span><b class="cnt" id="navAnnCount"></b></a>
+      <a href="#display" data-view="display"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></i><span class="nl">Display settings</span><span class="ns">Display</span><b class="cnt" id="navSetCount"></b></a>
+      <a href="#sheet" data-view="sheet"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg></i><span class="nl">Data &amp; sheet</span><span class="ns">Data</span></a>
     </nav>
     <div class="side-tv">
       <span class="k">TV display</span>
@@ -60,16 +60,16 @@
 
   <div class="side-backdrop" id="sideBackdrop"></div>
   <nav class="tabbar" aria-label="Sections">
-    <a href="#overview" data-view="overview" class="active"><i>◎</i>Overview</a>
-    <a href="#iqamah" data-view="iqamah"><i>◷</i>Iqamah</a>
-    <a href="#announcements" data-view="announcements"><i>▤</i>Notices</a>
-    <a href="#display" data-view="display"><i>▣</i>Display</a>
-    <a href="#sheet" data-view="sheet"><i>⌗</i>Data</a>
+    <a href="#overview" data-view="overview" class="active"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></i>Overview</a>
+    <a href="#iqamah" data-view="iqamah"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i>Iqamah</a>
+    <a href="#announcements" data-view="announcements"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></svg></i>Notices</a>
+    <a href="#display" data-view="display"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></i>Display</a>
+    <a href="#sheet" data-view="sheet"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg></i>Data</a>
   </nav>
   <div class="main">
     <header class="tophdr">
       <button class="menu-btn side-toggle" id="sideToggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <h1 id="viewTitle">Overview</h1>
+      <div class="ttl"><h1 id="viewTitle">Overview</h1><p class="vsub" id="viewSub">Aasiya Musalla · Regina, SK</p></div>
       <div class="hdr-acts">
         <span class="synced" id="syncedAt"></span>
         <button class="btn btn-ghost btn-sm" id="reloadBtn" type="button">↻ Reload data</button>
@@ -79,31 +79,40 @@
     </header>
 
     <div class="banner warn" id="setupBanner" hidden>
-      <b>Saving isn’t connected yet.</b> <span id="setupText">The Apps Script web app didn’t respond. Open the Apps Script editor, make sure the latest <code>AppsScript.gs</code> is pasted, then <em>Deploy → Manage deployments → ✎ → New version → Deploy</em>.</span>
+      <i class="bic">!</i><div><b>Saving isn’t connected yet.</b> <span id="setupText">The Apps Script web app didn’t respond. Open the Apps Script editor, make sure the latest <code>AppsScript.gs</code> is pasted, then <em>Deploy → Manage deployments → ✎ → New version → Deploy</em>.</span></div>
     </div>
 
     <!-- ---------- OVERVIEW ---------- -->
     <section class="view" data-view="overview">
-      <div class="stats">
-        <div class="stat">
-          <span class="k">Now</span>
+      <div class="ovhero">
+        <div class="ovh-l">
+          <span class="k" id="ovGreet">Assalamu alaikum</span>
           <b id="ovClock">—</b>
           <span class="s" id="ovDate">—</span>
         </div>
-        <div class="stat">
+        <div class="ovh-r">
           <span class="k" id="ovLabel">Current prayer</span>
           <b id="ovPrayer">—</b>
           <span class="s" id="ovIq">—</span>
+          <div class="ovbar"><i id="ovBar"></i></div>
+          <span class="ovnext" id="ovNext"></span>
         </div>
-        <div class="stat">
+      </div>
+      <div class="stats stats3">
+        <a class="stat" href="#announcements">
           <span class="k">Live announcements</span>
           <b id="ovAnn">0</b>
           <span class="s" id="ovAnnSub">—</span>
-        </div>
-        <div class="stat">
+        </a>
+        <a class="stat" href="#iqamah">
           <span class="k">Schedule in effect</span>
           <b id="ovSched">—</b>
           <span class="s" id="ovSchedSub">—</span>
+        </a>
+        <div class="stat">
+          <span class="k">Sun today</span>
+          <b id="ovSunB">—</b>
+          <span class="s" id="ovSun">—</span>
         </div>
       </div>
 
@@ -111,15 +120,14 @@
         <div class="panel">
           <div class="panel-h"><h2>Today’s times</h2><span class="hint">Exactly what the website and TV are showing</span></div>
           <div class="tblwrap"><table class="tbl" id="ovTable"><thead><tr><th>Prayer</th><th>Begins</th><th>Iqamah</th><th>Rule</th></tr></thead><tbody></tbody></table></div>
-          <div class="sunrow" id="ovSun"></div>
         </div>
         <div class="panel">
           <div class="panel-h"><h2>Quick actions</h2></div>
           <div class="qa">
-            <a href="#iqamah" class="qa-item"><i>◷</i><div><b>Change iqamah times</b><span>Edit the current schedule — changes go live within 5 minutes.</span></div></a>
-            <a href="#display" class="qa-item"><i>▣</i><div><b>Display settings</b><span>Ticker speed, alert lengths, text size and more.</span></div></a>
-            <a href="#announcements" class="qa-item" id="qaAnn"><i>▤</i><div><b>Post an announcement</b><span>Shown on the website and scrolled across the TV ticker.</span></div></a>
-            <a href="prayerdisplay.html" target="_blank" rel="noopener" class="qa-item"><i>▣</i><div><b>Preview the TV display</b><span>Opens in a new tab — press F for full screen.</span></div></a>
+            <a href="#iqamah" class="qa-item"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><div><b>Change iqamah times</b><span>Edit the current schedule — changes go live within 5 minutes.</span></div></a>
+            <a href="#display" class="qa-item"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></i><div><b>Display settings</b><span>Ticker speed, alert lengths, text size and more.</span></div></a>
+            <a href="#announcements" class="qa-item" id="qaAnn"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></svg></i><div><b>Post an announcement</b><span>Shown on the website and scrolled across the TV ticker.</span></div></a>
+            <a href="prayerdisplay.html" target="_blank" rel="noopener" class="qa-item"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></i><div><b>Preview the TV display</b><span>Opens in a new tab — press F for full screen.</span></div></a>
           </div>
           <div class="panel-h" style="margin-top:22px"><h2>Recent announcements</h2></div>
           <div id="ovAnnList" class="mini-list"></div>
@@ -406,13 +414,15 @@ function renderOverview(){
   if(DAY){
     const fi=A.focusIndex(DAY,n.hours);
     tb.innerHTML=DAY.prayers.map((p,i)=>'<tr'+(i===fi?' class="cur"':'')+'><td><b>'+p.label+'</b></td><td>'+A.fmtTime(p.begin)+'</td><td class="iq">'+(p.iq!=null?A.fmtTime(p.iq):esc(p.iqText||"—"))+'</td><td class="rule"><code>'+esc((eff&&eff.vals[i])||(p.key==="maghrib"?"+"+Math.round(A.CFG.maghribIqamahMinutes):"+10"))+'</code></td></tr>').join("");
-    $("ovSun").innerHTML="Sunrise <b>"+A.fmtTime(DAY.sunrise)+"</b> · Sunset <b>"+A.fmtTime(DAY.sunset)+"</b>";
+    $("ovSunB").textContent=A.fmtTime(DAY.sunrise)+" – "+A.fmtTime(DAY.sunset);
+    $("ovSun").textContent="Sunrise – sunset · daylight "+(function(){const d=DAY.sunset-DAY.sunrise;return Math.floor(d)+" h "+Math.round((d%1)*60)+" min";})();
   }else{ tb.innerHTML='<tr><td colspan="4" class="muted">Prayer times unavailable (offline?)</td></tr>'; }
   $("ovAnnList").innerHTML=ROWS.length? ROWS.slice(-4).reverse().map(r=>{ const st=A.announcementState({start:A.parseDateKey(r.start),end:A.parseDateKey(r.end)},n); return '<div class="mini"><span class="pill '+st+'">'+({live:"Live",sched:"Scheduled",past:"Expired"})[st]+'</span><span>'+esc(r.message)+'</span></div>'; }).join("") : '<div class="empty">No announcements yet.</div>';
 }
 function tickOverview(){
   const n=A.mosqueNow();
   $("ovClock").textContent=A.fmtTime(n.hours).replace(/:(\d\d) /,":$1 ");
+  { const hh=Math.floor(n.hours); $("ovGreet").textContent=hh<5?"Good night":hh<12?"Good morning":hh<17?"Good afternoon":"Good evening"; }
   if(!DAY) return;
   const fi=A.focusIndex(DAY,n.hours); const cur=fi>=0?DAY.prayers[fi]:DAY.prayers[4];
   $("ovLabel").textContent=fi>=0&&n.hours<cur.begin?"Upcoming prayer":"Current prayer";
@@ -420,6 +430,11 @@ function tickOverview(){
   if(cur.iq!=null&&n.hours<cur.iq){ const s=Math.max(0,Math.round((cur.iq-n.hours)*3600)); $("ovIq").textContent="Iqamah "+A.fmtTime(cur.iq)+" · in "+Math.floor(s/60)+" min"; }
   else $("ovIq").textContent="Iqamah "+(cur.iq!=null?A.fmtTime(cur.iq):(cur.iqText||"—"));
   const trs=$("ovTable").querySelectorAll("tbody tr"); trs.forEach((tr,i)=>tr.classList.toggle("cur",i===fi));
+  { const bar=$("ovBar"), nx=$("ovNext"); let pct=0, txt="";
+    if(cur.iq!=null&&n.hours>=cur.begin&&n.hours<cur.iq){ pct=(n.hours-cur.begin)/(cur.iq-cur.begin); txt="Adhan was "+A.fmtTime(cur.begin)+" · iqamah in "+Math.max(1,Math.round((cur.iq-n.hours)*60))+" min"; }
+    else if(n.hours<cur.begin){ pct=0; const m=Math.round((cur.begin-n.hours)*60); txt="Adhan in "+(m>=60?Math.floor(m/60)+" h "+(m%60)+" min":m+" min"); }
+    else { pct=1; const nxp=DAY.prayers[fi+1]; txt=nxp?"Next: "+nxp.label+" at "+A.fmtTime(nxp.begin):"Next: Fajr tomorrow"; }
+    bar.style.width=Math.round(Math.min(1,Math.max(0,pct))*100)+"%"; nx.textContent=txt; }
 }
 
 /* ---- Iqamah editor ---- */
@@ -645,5 +660,5 @@ const s=session(); if(s) boot(s.email); else $("email").focus();
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a37b50b98cecef12',t:'MTc4ODg0Mjg0OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a37bac751ea55819',t:'MTc4ODg0NjYwNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
