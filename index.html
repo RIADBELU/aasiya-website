@@ -6,7 +6,7 @@
 <title>Aasiya Musalla — Regina, Saskatchewan</title>
 <meta name="description" content="Aasiya Musalla prayer times, iqamah schedule and community announcements — Regina, Saskatchewan.">
 <link rel="canonical" href="https://aasiyaregina.xubi.org/">
-<link rel="stylesheet" href="site.css?v=202609060200">
+<link rel="stylesheet" href="site.css?v=202609080100">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -58,7 +58,7 @@
     <div class="wrap">
       <div>
         <span class="eyebrow">A place of prayer in Regina</span>
-        <h1>Uniting our Ummah with Allah, peacefully</h1>
+        <h1>Uniting our Ummah with Allah, <em>peacefully</em></h1>
         <p class="lead">“Indeed, in the remembrance of Allah do hearts find rest.” — Qur’an 13:28</p>
         <div class="actions">
           <a class="btn btn-gold" href="#prayer">Today’s prayer times</a>
@@ -452,5 +452,13 @@ if("serviceWorker" in navigator && location.protocol==="https:") navigator.servi
 setInterval(tick,1000); setInterval(sync,5*60*1000);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3796a38b8bebe80',t:'MTc4ODgyMjkyMQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>
+(function(){ const els=[...document.querySelectorAll('.sec-head, .ptable .p, .ann, .info, .people .person, .cta, .mwrap, .aside-card')]; if(!('IntersectionObserver' in window)){return;}
+  els.forEach((el,i)=>{ el.classList.add('rv'); el.style.transitionDelay=Math.min((i%6)*60,300)+'ms'; });
+  const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{rootMargin:'0px 0px -8% 0px',threshold:.08});
+  els.forEach(el=>io.observe(el));
+  new MutationObserver(()=>{ document.querySelectorAll('.ptable .p:not(.rv), .ann:not(.rv)').forEach(el=>{ el.classList.add('rv','in'); }); }).observe(document.body,{subtree:true,childList:true});
+})();
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a37b4dcfcdf7ef12',t:'MTc4ODg0MjcyOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
