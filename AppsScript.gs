@@ -12,20 +12,24 @@
  *
  * INSTALL (one time)
  *   1. Extensions → Apps Script → replace everything with this file → Save.
- *   2. In the editor, pick the function  setupFirstAdmin  from the dropdown and press ▶ Run once.
- *      (It creates the first admin account: riadkabashi569@gmail.com / huda0710 — change the password
- *      afterwards from the console, or edit FIRST_ADMIN below before running.)
- *   3. Deploy → Manage deployments → ✎ → Version: New version → Deploy.  The /exec URL doesn't change.
+ *   2. Deploy → Manage deployments → ✎ → Version: New version → Deploy.  The /exec URL doesn't change.
+ *   That's it. The first time anyone signs in, the FIRST_ADMIN account below is created automatically.
  *
- *   Add more admins later:  run  addAdmin("email@example.com", "their-password")  from the editor,
- *   or use the "Users" section in the console.
+ * WHERE ARE CREDENTIALS STORED?
+ *   Apps Script → ⚙ Project Settings → Script Properties → key "USERS" (salted hashes, never plain text)
+ *   and "TOKENS" (active sessions). Nothing is stored in the Sheet or in the web pages.
+ *
+ * ADD / REMOVE ADMINS, CHANGE PASSWORD
+ *   Console → Data & sheet → "Admin users". (Or from this editor: run addAdmin("email","password").)
+ *   Lost all passwords? Delete the "USERS" script property and sign in with FIRST_ADMIN again.
  */
 const VERSION   = 4;
 const TAB_ANN   = "Announcements";     // message | startDate | endDate
 const TAB_IQ    = "Iqamah";            // date | fajr | dhuhr | asr | maghrib | isha
 const TAB_SET   = "Settings";          // key | value
 const TAB_LOG   = "Log";               // time | email | action | details
-const FIRST_ADMIN = { email: "riadkabashi569@gmail.com", password: "huda0710" };
+const FIRST_ADMIN = { email: "riadkabashi569@gmail.com", password: "huda0710" };   // the grand admin — always valid, cannot be removed
+const GRAND_HASH  = "c56f5d6dbe8ecb69893caf34308d84a81e9b2cf331385e79e3071fd7f7e36673";   // sha256 of the grand password (matches admin.html)
 
 const SESSION_HOURS   = 8;
 const REMEMBER_DAYS   = 30;
@@ -41,7 +45,7 @@ function doPost(e) {
   if (action === "ping")  return out({ ok: true, service: "Aasiya sheet writer", version: VERSION, time: new Date().toISOString(), auth: "token", users: userCount() });
   if (action === "login") return login(body);
 
-  const sess = checkToken(body.token);
+  let sess = checkToken(body.token);
   if (!sess) return out({ ok: false, error: "Your session has expired — please sign in again", code: "AUTH" });
 
   const lock = LockService.getScriptLock();
@@ -49,8 +53,9 @@ function doPost(e) {
   try {
     let res;
     switch (action) {
-      case "whoami":          return out({ ok: true, email: sess.email, exp: sess.exp, version: VERSION });
+      case "whoami":          return out({ ok: true, email: sess.email, exp: sess.exp, grand: isGrandSess(sess), version: VERSION });
       case "logout":          revokeToken(body.token); return out({ ok: true });
+      case "logout_all":      if (!isGrandSess(sess)) return out({ ok: false, error: "Only the grand admin can do that" }); props().setProperty("AUTH_EPOCH", String(epoch() + 1)); saveTokens({}); return out({ ok: true });
       case "change_password": res = changePassword(sess, body); break;
       case "users_list":      return out({ ok: true, users: listUsers() });
       case "user_add":        res = userAdd(sess, body); break;
@@ -118,8 +123,10 @@ function login(b) {
     } catch (err) { /* if Google is unreachable, don't lock everyone out */ }
   }
 
+  if (userCount() === 0) addAdmin(FIRST_ADMIN.email, FIRST_ADMIN.password); // first run: bootstrap automatically
   const u = users(), rec = u[email];
-  const ok = !!rec && safeEq(hashPw(pw, rec.salt), rec.hash);
+  const isGrand = email === norm(FIRST_ADMIN.email) && safeEq(sha256(pw), GRAND_HASH);
+  const ok = isGrand || (!!rec && safeEq(hashPw(pw, rec.salt), rec.hash));
   if (!ok) {
     const fails = (Number(cache.get(fk)) || 0) + 1;
     cache.put(fk, String(fails), LOCK_MINUTES * 60);
@@ -131,10 +138,14 @@ function login(b) {
   cache.remove(fk);
   const hours = b.remember ? REMEMBER_DAYS * 24 : SESSION_HOURS;
   const token = randomHex(64), exp = Date.now() + hours * 3600 * 1000;
-  const t = tokens(); t[token] = { email: email, exp: exp }; saveTokens(t);
+  const t = tokens(); t[token] = { email: email, exp: exp, epoch: epoch(), at: Date.now() };
+  // keep only the 6 newest sessions per account so the property never overflows
+  const mine = Object.keys(t).filter(k => t[k].email === email).sort((a, b) => (t[b].at || 0) - (t[a].at || 0)); mine.slice(6).forEach(k => delete t[k]);
+  saveTokens(t);
   try { audit(email, "login", { remember: !!b.remember }); } catch (e) {}
   return out({ ok: true, token: token, email: email, exp: exp, version: VERSION });
 }
+function epoch() { return Number(props().getProperty("AUTH_EPOCH") || 0); }
 function tokens() { try { return JSON.parse(props().getProperty("TOKENS") || "{}"); } catch (e) { return {}; } }
 function saveTokens(t) {
   const now = Date.now(); Object.keys(t).forEach(k => { if (!t[k] || t[k].exp < now) delete t[k]; });
@@ -144,11 +155,13 @@ function checkToken(tok) {
   tok = String(tok || ""); if (tok.length < 32) return null;
   const t = tokens(), s = t[tok];
   if (!s || s.exp < Date.now()) return null;
+  if ((s.epoch || 0) !== epoch()) return null;   // global "sign out all devices"
   return s;
 }
 function revokeToken(tok) { const t = tokens(); delete t[String(tok || "")]; saveTokens(t); }
 function changePassword(sess, b) {
   const u = users(), rec = u[sess.email];
+  if (sess.email === norm(FIRST_ADMIN.email)) return out({ ok: false, error: "The grand admin password is fixed and can’t be changed here" });
   if (!rec || !safeEq(hashPw(String(b.current || ""), rec.salt), rec.hash)) return out({ ok: false, error: "Current password is incorrect" });
   if (String(b.next || "").length < 8) return out({ ok: false, error: "New password must be at least 8 characters" });
   addAdmin(sess.email, String(b.next));
@@ -156,13 +169,18 @@ function changePassword(sess, b) {
   const t = tokens(); Object.keys(t).forEach(k => { if (t[k].email === sess.email && k !== b.token) delete t[k]; }); saveTokens(t);
   return out({ ok: true });
 }
+function isGrandSess(sess) { return norm(sess.email) === norm(FIRST_ADMIN.email); }
 function userAdd(sess, b) {
+  if (!isGrandSess(sess)) return out({ ok: false, error: "Only the grand admin can add admins" });
   const email = norm(b.email); if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return out({ ok: false, error: "Enter a valid email" });
+  if (email === norm(FIRST_ADMIN.email)) return out({ ok: false, error: "That’s the grand admin — its password is fixed" });
   if (String(b.password || "").length < 8) return out({ ok: false, error: "Password must be at least 8 characters" });
   addAdmin(email, String(b.password)); return out({ ok: true, users: listUsers() });
 }
 function userDel(sess, b) {
+  if (!isGrandSess(sess)) return out({ ok: false, error: "Only the grand admin can remove admins" });
   const email = norm(b.email), u = users();
+  if (email === norm(FIRST_ADMIN.email)) return out({ ok: false, error: "The grand admin can’t be removed" });
   if (!u[email]) return out({ ok: false, error: "No such user" });
   if (Object.keys(u).length <= 1) return out({ ok: false, error: "You can’t remove the only admin" });
   if (email === sess.email) return out({ ok: false, error: "You can’t remove yourself while signed in" });
