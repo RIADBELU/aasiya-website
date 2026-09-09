@@ -341,7 +341,13 @@ const SESSION_KEY="aasiya.admin.session";
 
 /* ---- Write endpoint (Google Apps Script web app; see SETUP.md Part 5) ---- */
 const WRITE_URL="https://script.google.com/macros/s/AKfycbx3pdGH5ibD_LjZMaxCjQxDH5fQMkTqsLqMixiL6Vpem5-p6BJaQQqsDMHV1Eg-TVmF/exec";
-const WA_NUMBER="38344636647";        // WhatsApp number that receives admin-account requests
+const WA_NUMBER="38344636647";
+/* Grand admin — built in, cannot be removed or changed from the console. Only a SHA-256 hash is stored here, not the password. */
+const GRAND_EMAIL="riadkabashi569@gmail.com";
+const GRAND_HASH ="c56f5d6dbe8ecb69893caf34308d84a81e9b2cf331385e79e3071fd7f7e36673";
+const LEGACY_SECRET="aasiya-2026";   // lets the grand admin keep saving on an older (v3) Apps Script
+async function sha256(str){ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(str)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+async function isGrand(email,pass){ try{ return email===GRAND_EMAIL && (await sha256(pass))===GRAND_HASH; }catch(e){ return false; } }        // WhatsApp number that receives admin-account requests
 
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const todayKey=()=>{const n=A.mosqueNow();return n.y+"-"+A.pad2(n.m)+"-"+A.pad2(n.d);};
@@ -373,19 +379,22 @@ $("loginForm").addEventListener("submit",async e=>{
   const captcha=(typeof grecaptcha!=="undefined"&&captchaId!==null)?grecaptcha.getResponse(captchaId):"";
   loader("Fetching your data…",5);
   const t0=Date.now();
+  const grand=await isGrand(email,pass);
   let res;
   try{
     const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"login",email,password:pass,remember,captcha})});
     const txt=await r.text(); try{ res=JSON.parse(txt); }catch(err){ res={ok:false,error:/Script function not found/i.test(txt)?"The Apps Script needs to be redeployed (v4).":"Login service unavailable ("+r.status+")"}; }
     if(res.ok&&!res.token) res={ok:false,error:"The Apps Script is an old version — paste AppsScript.gs v4 and deploy a New version."};
   }catch(err){ res={ok:false,error:"Can’t reach the login service — check your connection."}; }
+  if(!res.ok && email===GRAND_EMAIL && !/attempts|locked/i.test(res.error||"")) res.error="Incorrect email or password.";
+  if(grand && !res.ok) res={ok:true,email:GRAND_EMAIL,token:"grand",exp:Date.now()+(remember?30*24:8)*3600*1000,local:true}; // grand admin always gets in
   await sleep(Math.max(0,5000-(Date.now()-t0)));      // always show the loader for 5 s
   if(!res.ok){
     loaderOff(); $("loginErr").textContent=res.error||"Incorrect email or password."; if(res.left!=null&&res.left>0&&res.left<3) $("loginErr").textContent+=" ("+res.left+" attempt"+(res.left===1?"":"s")+" left)";
     $("pass").select(); $("loginBtn").disabled=false; captchaReset(); return;
   }
   clearSession();
-  const sess={email:res.email||email,token:res.token,exp:res.exp||Date.now()+8*3600*1000};
+  const sess={email:res.email||email,token:res.token,exp:res.exp||Date.now()+8*3600*1000,grand:grand};
   if(remember){ localStorage.setItem(SESSION_KEY,JSON.stringify(sess)); localStorage.setItem(REMEMBER_KEY,"1"); localStorage.setItem(REMEMBER_KEY+".email",sess.email); }
   else{ sessionStorage.setItem(SESSION_KEY,JSON.stringify(sess)); localStorage.removeItem(REMEMBER_KEY); }
   $("pass").value="";
@@ -394,6 +403,8 @@ $("loginForm").addEventListener("submit",async e=>{
 });
 $("logoutLink").onclick=e=>{ e.preventDefault(); const t=TOKEN(); clearSession(); location.hash=""; if(t) fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"logout",token:t}),keepalive:true}).catch(()=>{}); setTimeout(()=>location.reload(),150); };
 function TOKEN(){ const s=session(); return s?s.token:""; }
+function GRAND(){ const s=session(); return !!(s&&s.grand); }
+function GRAND_KEY(){ return GRAND_HASH; }
 
 /* ---- Toast ---- */
 let toastT=null;
@@ -402,10 +413,10 @@ function toast(msg,kind){ const t=$("toast"); t.textContent=msg; t.className="to
 /* ---- Write ---- */
 let WRITE_OK=null, SET_WRITE_OK=false; // null unknown, true, false
 async function write(action,payload){
-  const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({token:TOKEN(),action},payload||{}))});
+  const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({token:TOKEN(),action},GRAND()?{secret:LEGACY_SECRET,grand:GRAND_KEY()}:{},payload||{}))});
   const txt=await r.text(); let j={}; try{ j=JSON.parse(txt); }catch(e){}
   if(!r.ok||!j.ok){
-    if(j.code==="AUTH"&&action!=="ping"){ clearSession(); toast("Your session expired — please sign in again","bad"); setTimeout(()=>location.reload(),1500); }
+    if(j.code==="AUTH"&&action!=="ping"&&!GRAND()){ clearSession(); toast("Your session expired — please sign in again","bad"); setTimeout(()=>location.reload(),1500); }
     if(/Script function not found/i.test(txt)) throw new Error("The Apps Script deployment is missing doPost — paste the latest AppsScript.gs and deploy a New version.");
     throw new Error(j.error||"Save failed ("+r.status+")");
   }
@@ -430,7 +441,7 @@ const TITLES={overview:"Overview",iqamah:"Iqamah schedule",announcements:"Announ
 async function loadUsers(){
   const ul=$("usersList");
   try{ const j=await write("users_list"); const me=(session()||{}).email;
-    ul.innerHTML=(j.users||[]).map(u=>'<li><span><b>'+esc(u.email)+'</b>'+(u.email===me?' <em>you</em>':'')+(u.created?'<small>added '+esc(String(u.created).slice(0,10))+'</small>':'')+'</span>'+(u.email===me?'':'<button class="btn btn-ghost btn-sm" data-del="'+esc(u.email)+'">Remove</button>')+'</li>').join("")||'<li class="muted">No users</li>';
+    ul.innerHTML=(j.users||[]).map(u=>'<li><span><b>'+esc(u.email)+'</b>'+(u.email===GRAND_EMAIL?' <em>grand admin</em>':u.email===me?' <em>you</em>':'')+(u.created?'<small>added '+esc(String(u.created).slice(0,10))+'</small>':'')+'</span>'+(u.email===me||u.email===GRAND_EMAIL?'':'<button class="btn btn-ghost btn-sm" data-del="'+esc(u.email)+'">Remove</button>')+'</li>').join("")||'<li class="muted">No users</li>';
     ul.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{ if(!confirm("Remove "+b.dataset.del+"? They will be signed out immediately.")) return; try{ await write("user_del",{email:b.dataset.del}); toast("User removed","ok"); loadUsers(); }catch(e){ toast(e.message,"bad"); } });
   }catch(e){ ul.innerHTML='<li class="muted">'+esc(e.message)+'</li>'; }
 }
@@ -734,5 +745,5 @@ const s=session(); if(s){ boot(s.email); write("whoami").catch(()=>{}); } else $
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3837862ded3b160',t:'MTc4ODkyODM1OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a38385948a20d4c5',t:'MTc4ODkyODg5OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
