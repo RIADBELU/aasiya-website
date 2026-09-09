@@ -6,7 +6,7 @@
 <title>Admin — Aasiya Musalla</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="site.css?v=202609050548">
-<link rel="stylesheet" href="admin.css?v=202609080310">
+<link rel="stylesheet" href="admin.css?v=202609081200">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -31,8 +31,19 @@
       <div class="err" id="loginErr"></div>
       <button class="btn btn-gold btn-lg" type="submit" id="loginBtn">Sign in</button>
     </form>
+    <div class="login-or"><span>Don’t have an account?</span></div>
+    <a class="btn btn-wa" id="reqAdmin" target="_blank" rel="noopener" href="#"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 1.8a8.2 8.2 0 1 1-4.2 15.3l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8Zm-3.3 4.4c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5 0 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4l-.5-.3-1.8-.9c-.3-.1-.4-.1-.6.1l-.8 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-3.4-3c-.2-.4.3-.4.8-1.4.1-.2 0-.4 0-.5l-.8-2c-.2-.5-.4-.4-.6-.4h-.7Z"/></svg>Request an admin account</a>
     <button class="theme-btn login-theme" id="themeBtnLogin" type="button" aria-label="Toggle dark mode">☾</button>
           <a class="back" href="index.html">← Back to website</a>
+  </div>
+</div>
+
+<!-- loading overlay -->
+<div class="loader" id="loader" hidden>
+  <div class="loader-card">
+    <div class="ring"><img src="assets/mark.png" alt="" width="40" height="31"></div>
+    <div class="loader-txt" id="loaderTxt">Fetching your data…</div>
+    <div class="loader-bar"><i id="loaderBar"></i></div>
   </div>
 </div>
 
@@ -296,47 +307,70 @@ const A=window.Aasiya, $=id=>document.getElementById(id);
 /* ---- Access -------------------------------------------------------------
    Credentials are checked against a SHA-256 hash so the password never appears
    in the file. (A light gate for a public notice board, not bank-grade security.) */
-const ADMIN_EMAIL="riadkabashi569@gmail.com";
 /* Google reCAPTCHA v2 ("I'm not a robot" checkbox).
    Site key registered for aasiyaregina.xubi.org — manage at https://www.google.com/recaptcha/admin */
 const RECAPTCHA_SITE_KEY="6LfaG6wtAAAAAC-Pa0i6ILurTOyt8w9UCyeuGcJW";
 let captchaId=null;
 window.captchaReady=function(){ try{ captchaId=grecaptcha.render("captcha",{sitekey:RECAPTCHA_SITE_KEY,theme:document.documentElement.dataset.theme==="dark"?"dark":"light",callback:()=>{document.getElementById("loginErr").textContent="";}}); }catch(e){} };
-function captchaOK(){ if(typeof grecaptcha==="undefined"||captchaId===null) return navigator.onLine===false; return !!grecaptcha.getResponse(captchaId); }
+function captchaOK(){ if(window.__noCaptcha) return true; if(typeof grecaptcha==="undefined"||captchaId===null) return navigator.onLine===false; return !!grecaptcha.getResponse(captchaId); }
 function captchaReset(){ try{ grecaptcha.reset(captchaId); }catch(e){} }
-const ADMIN_HASH ="c56f5d6dbe8ecb69893caf34308d84a81e9b2cf331385e79e3071fd7f7e36673";
 const SESSION_KEY="aasiya.admin.session";
 
 /* ---- Write endpoint (Google Apps Script web app; see SETUP.md Part 5) ---- */
 const WRITE_URL="https://script.google.com/macros/s/AKfycbx3pdGH5ibD_LjZMaxCjQxDH5fQMkTqsLqMixiL6Vpem5-p6BJaQQqsDMHV1Eg-TVmF/exec";
-const WRITE_SECRET="aasiya-2026";   // must match SECRET in the Apps Script
+const WA_NUMBER="38344636647";        // WhatsApp number that receives admin-account requests
 
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const todayKey=()=>{const n=A.mosqueNow();return n.y+"-"+A.pad2(n.m)+"-"+A.pad2(n.d);};
 const fmtIq=iq=>iq.hours!=null?A.fmtTime(iq.hours):(iq.text||"—");
 
-async function sha256(s){ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
 const REMEMBER_KEY="aasiya.admin.remember";
-function readSess(store){ try{ const s=JSON.parse(store.getItem(SESSION_KEY)||"null"); return s&&s.email===ADMIN_EMAIL&&s.exp>Date.now()?s:null; }catch(e){return null;} }
+function readSess(store){ try{ const s=JSON.parse(store.getItem(SESSION_KEY)||"null"); return s&&s.token&&s.email&&s.exp>Date.now()?s:null; }catch(e){return null;} }
 function session(){ return readSess(sessionStorage)||readSess(localStorage); }
 function clearSession(){ sessionStorage.removeItem(SESSION_KEY); localStorage.removeItem(SESSION_KEY); }
-(function(){ try{ if(localStorage.getItem(REMEMBER_KEY)==="1"){ $("remember").checked=true; $("email").value=ADMIN_EMAIL; } }catch(e){} })();
+(function(){ try{ if(localStorage.getItem(REMEMBER_KEY)==="1"){ $("remember").checked=true; $("email").value=localStorage.getItem(REMEMBER_KEY+".email")||""; } }catch(e){} })();
+$("reqAdmin").href="https://wa.me/"+WA_NUMBER+"?text="+encodeURIComponent("Assalamu alaikum,\n\nI would like to request an admin account for the Aasiya Musalla console (aasiyaregina.xubi.org/admin.html).\n\nName: \nEmail for the account: \nRole at the musalla: \n\nJazakAllah khair.");
 
 $("pwToggle").onclick=()=>{ const p=$("pass"); const show=p.type==="password"; p.type=show?"text":"password"; $("pwToggle").textContent=show?"Hide":"Show"; };
+/* ---- Loader overlay ---- */
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function loader(msg,seconds){
+  const L=$("loader"); L.hidden=false; $("loaderTxt").textContent=msg;
+  const bar=$("loaderBar"); bar.style.transition="none"; bar.style.width="0%"; void bar.offsetWidth;
+  bar.style.transition="width "+seconds+"s linear"; bar.style.width="100%";
+}
+function loaderOff(){ $("loader").hidden=true; }
+
 $("loginForm").addEventListener("submit",async e=>{
   e.preventDefault(); $("loginErr").textContent="";
   const email=$("email").value.trim().toLowerCase(), pass=$("pass").value;
-  if(!crypto.subtle){ $("loginErr").textContent="Open this page over https:// or localhost to sign in."; return; }
   if(!captchaOK()){ $("loginErr").textContent="Please tick “I'm not a robot” first."; return; }
   $("loginBtn").disabled=true;
-  if(email===ADMIN_EMAIL && await sha256(pass)===ADMIN_HASH){
-    const remember=$("remember").checked; clearSession();
-    if(remember){ localStorage.setItem(SESSION_KEY,JSON.stringify({email,exp:Date.now()+30*24*3600*1000})); localStorage.setItem(REMEMBER_KEY,"1"); }
-    else{ sessionStorage.setItem(SESSION_KEY,JSON.stringify({email,exp:Date.now()+8*3600*1000})); localStorage.removeItem(REMEMBER_KEY); }
-    $("pass").value=""; boot(email);
-  }else{ $("loginErr").textContent="Incorrect email or password."; $("pass").select(); $("loginBtn").disabled=false; captchaReset(); }
+  const remember=$("remember").checked;
+  const captcha=(typeof grecaptcha!=="undefined"&&captchaId!==null)?grecaptcha.getResponse(captchaId):"";
+  loader("Fetching your data…",5);
+  const t0=Date.now();
+  let res;
+  try{
+    const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"login",email,password:pass,remember,captcha})});
+    const txt=await r.text(); try{ res=JSON.parse(txt); }catch(err){ res={ok:false,error:/Script function not found/i.test(txt)?"The Apps Script needs to be redeployed (v4).":"Login service unavailable ("+r.status+")"}; }
+    if(res.ok&&!res.token) res={ok:false,error:"The Apps Script is an old version — paste AppsScript.gs v4 and deploy a New version."};
+  }catch(err){ res={ok:false,error:"Can’t reach the login service — check your connection."}; }
+  await sleep(Math.max(0,5000-(Date.now()-t0)));      // always show the loader for 5 s
+  if(!res.ok){
+    loaderOff(); $("loginErr").textContent=res.error||"Incorrect email or password."; if(res.left!=null&&res.left>0&&res.left<3) $("loginErr").textContent+=" ("+res.left+" attempt"+(res.left===1?"":"s")+" left)";
+    $("pass").select(); $("loginBtn").disabled=false; captchaReset(); return;
+  }
+  clearSession();
+  const sess={email:res.email||email,token:res.token,exp:res.exp||Date.now()+8*3600*1000};
+  if(remember){ localStorage.setItem(SESSION_KEY,JSON.stringify(sess)); localStorage.setItem(REMEMBER_KEY,"1"); localStorage.setItem(REMEMBER_KEY+".email",sess.email); }
+  else{ sessionStorage.setItem(SESSION_KEY,JSON.stringify(sess)); localStorage.removeItem(REMEMBER_KEY); }
+  $("pass").value="";
+  loader("Plugging your account…",1.6); await sleep(1700);
+  loaderOff(); boot(sess.email);
 });
-$("logoutLink").onclick=e=>{ e.preventDefault(); clearSession(); location.hash=""; location.reload(); };
+$("logoutLink").onclick=e=>{ e.preventDefault(); const t=TOKEN(); clearSession(); location.hash=""; if(t) fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"logout",token:t}),keepalive:true}).catch(()=>{}); setTimeout(()=>location.reload(),150); };
+function TOKEN(){ const s=session(); return s?s.token:""; }
 
 /* ---- Toast ---- */
 let toastT=null;
@@ -345,16 +379,17 @@ function toast(msg,kind){ const t=$("toast"); t.textContent=msg; t.className="to
 /* ---- Write ---- */
 let WRITE_OK=null, SET_WRITE_OK=false; // null unknown, true, false
 async function write(action,payload){
-  const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({secret:WRITE_SECRET,action},payload||{}))});
+  const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({token:TOKEN(),action},payload||{}))});
   const txt=await r.text(); let j={}; try{ j=JSON.parse(txt); }catch(e){}
   if(!r.ok||!j.ok){
+    if(j.code==="AUTH"&&action!=="ping"){ clearSession(); toast("Your session expired — please sign in again","bad"); setTimeout(()=>location.reload(),1500); }
     if(/Script function not found/i.test(txt)) throw new Error("The Apps Script deployment is missing doPost — paste the latest AppsScript.gs and deploy a New version.");
     throw new Error(j.error||"Save failed ("+r.status+")");
   }
   return j;
 }
 async function pingWriter(){
-  try{ const j=await write("ping"); WRITE_OK=true; SET_WRITE_OK=!!j.version&&j.version>=3; if(!j.version||j.version<2){ WRITE_OK=false; $("setupText").innerHTML="The Apps Script is an <b>old version</b> without iqamah editing. Paste the latest <code>AppsScript.gs</code> and deploy a <em>New version</em>."; } }
+  try{ const j=await write("ping"); WRITE_OK=true; SET_WRITE_OK=!!j.version&&j.version>=3; if(!j.version||j.version<4){ WRITE_OK=false; $("setupText").innerHTML="The Apps Script is <b>older than v4</b> (no server-side login). Paste the latest <code>AppsScript.gs</code>, run <code>setupFirstAdmin</code> once, and deploy a <em>New version</em>."; } else if(!j.version||j.version<2){ WRITE_OK=false; $("setupText").innerHTML="The Apps Script is an <b>old version</b> without iqamah editing. Paste the latest <code>AppsScript.gs</code> and deploy a <em>New version</em>."; } }
   catch(err){ WRITE_OK=false; $("setupText").innerHTML=esc(err.message)+" Until then you can still edit the Sheet directly with “Open Sheet”."; }
   $("setupBanner").hidden=WRITE_OK===true;
   paintConn();
@@ -649,7 +684,7 @@ function boot(email){
   setInterval(tickOverview,1000); setInterval(()=>{ if(!DIRTY&&!SET_DIRTY&&EDIT===null) loadAll(); },5*60*1000);
   window.addEventListener("beforeunload",e=>{ if(DIRTY||SET_DIRTY){ e.preventDefault(); e.returnValue=""; } });
 }
-const s=session(); if(s) boot(s.email); else $("email").focus();
+const s=session(); if(s){ boot(s.email); write("whoami").catch(()=>{}); } else $("email").focus();
 })();
 
 (function(){
@@ -660,5 +695,5 @@ const s=session(); if(s) boot(s.email); else $("email").focus();
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a37bb7344b3e3753',t:'MTc4ODg0NzA0NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a38364ab5fefba29',t:'MTc4ODkyNzU1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
