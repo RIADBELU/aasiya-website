@@ -6,7 +6,7 @@
 <title>Admin — Aasiya Musalla</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="site.css?v=202609050548">
-<link rel="stylesheet" href="admin.css?v=202609081200">
+<link rel="stylesheet" href="admin.css?v=202609081230">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -292,6 +292,29 @@
           <div class="rawwrap"><table class="tbl raw" id="rawSet"></table></div>
         </div>
       </div>
+      <div class="cols" style="margin-top:22px">
+        <div class="panel">
+          <div class="panel-h"><h2>Admin users</h2><span class="hint" id="usersHint">who can sign in here</span></div>
+          <p class="sub">Accounts are stored inside the Google Apps Script (Project Settings → Script Properties), as salted hashes — never in the Sheet or on the website.</p>
+          <ul class="ulist" id="usersList"><li class="muted">Loading…</li></ul>
+          <div class="panel-h" style="margin-top:18px"><h2>Add an admin</h2></div>
+          <div class="ufrm">
+            <input id="nuEmail" type="email" placeholder="email@example.com" autocomplete="off">
+            <input id="nuPass" type="text" placeholder="password (8+ characters)" autocomplete="off">
+            <button class="btn btn-gold" id="nuAdd" type="button">Add user</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-h"><h2>Change my password</h2></div>
+          <p class="sub">Signs out every other device using your account.</p>
+          <div class="ufrm col">
+            <input id="cpCur" type="password" placeholder="current password" autocomplete="current-password">
+            <input id="cpNew" type="password" placeholder="new password (8+ characters)" autocomplete="new-password">
+            <input id="cpNew2" type="password" placeholder="repeat new password" autocomplete="new-password">
+            <button class="btn btn-gold" id="cpSave" type="button">Update password</button>
+          </div>
+        </div>
+      </div>
     </section>
   </div>
 </div>
@@ -403,8 +426,24 @@ function paintConn(){
 
 /* ---- Views ---- */
 const TITLES={overview:"Overview",iqamah:"Iqamah schedule",announcements:"Announcements",display:"Display settings",sheet:"Data & sheet"};
+/* ---- Admin users ---- */
+async function loadUsers(){
+  const ul=$("usersList");
+  try{ const j=await write("users_list"); const me=(session()||{}).email;
+    ul.innerHTML=(j.users||[]).map(u=>'<li><span><b>'+esc(u.email)+'</b>'+(u.email===me?' <em>you</em>':'')+(u.created?'<small>added '+esc(String(u.created).slice(0,10))+'</small>':'')+'</span>'+(u.email===me?'':'<button class="btn btn-ghost btn-sm" data-del="'+esc(u.email)+'">Remove</button>')+'</li>').join("")||'<li class="muted">No users</li>';
+    ul.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{ if(!confirm("Remove "+b.dataset.del+"? They will be signed out immediately.")) return; try{ await write("user_del",{email:b.dataset.del}); toast("User removed","ok"); loadUsers(); }catch(e){ toast(e.message,"bad"); } });
+  }catch(e){ ul.innerHTML='<li class="muted">'+esc(e.message)+'</li>'; }
+}
+$("nuAdd").onclick=async()=>{ const email=$("nuEmail").value.trim(), password=$("nuPass").value;
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast("Enter a valid email","bad"); if(password.length<8) return toast("Password must be at least 8 characters","bad");
+  $("nuAdd").disabled=true; try{ await write("user_add",{email,password}); toast("Admin added — share the password with them privately","ok"); $("nuEmail").value=$("nuPass").value=""; loadUsers(); }catch(e){ toast(e.message,"bad"); } $("nuAdd").disabled=false; };
+$("cpSave").onclick=async()=>{ const cur=$("cpCur").value, n1=$("cpNew").value, n2=$("cpNew2").value;
+  if(n1.length<8) return toast("New password must be at least 8 characters","bad"); if(n1!==n2) return toast("New passwords don’t match","bad");
+  $("cpSave").disabled=true; try{ await write("change_password",{current:cur,next:n1}); toast("Password updated","ok"); $("cpCur").value=$("cpNew").value=$("cpNew2").value=""; }catch(e){ toast(e.message,"bad"); } $("cpSave").disabled=false; };
+
 function showView(v){
   if(!TITLES[v]) v="overview";
+  if(v==="sheet") loadUsers();
   document.querySelectorAll(".view").forEach(s=>s.hidden=s.dataset.view!==v);
   document.querySelectorAll(".sidenav a,.tabbar a").forEach(a=>a.classList.toggle("active",a.dataset.view===v));
   if(v==="display") pvEnsure();
@@ -695,5 +734,5 @@ const s=session(); if(s){ boot(s.email); write("whoami").catch(()=>{}); } else $
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a38364ab5fefba29',t:'MTc4ODkyNzU1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3837862ded3b160',t:'MTc4ODkyODM1OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
