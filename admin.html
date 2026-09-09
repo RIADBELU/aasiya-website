@@ -6,7 +6,7 @@
 <title>Admin — Aasiya Musalla</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="site.css?v=202609050548">
-<link rel="stylesheet" href="admin.css?v=202609081230">
+<link rel="stylesheet" href="admin.css?v=202609081300">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -297,8 +297,9 @@
           <div class="panel-h"><h2>Admin users</h2><span class="hint" id="usersHint">who can sign in here</span></div>
           <p class="sub">Accounts are stored inside the Google Apps Script (Project Settings → Script Properties), as salted hashes — never in the Sheet or on the website.</p>
           <ul class="ulist" id="usersList"><li class="muted">Loading…</li></ul>
-          <div class="panel-h" style="margin-top:18px"><h2>Add an admin</h2></div>
-          <div class="ufrm">
+          <div class="panel-h grand-only" style="margin-top:18px"><h2>Add an admin</h2><span class="hint">grand admin only</span></div>
+          <p class="sub not-grand" id="notGrandNote" hidden>Only the grand admin can add or remove admins. Ask them if someone else needs access.</p>
+          <div class="ufrm grand-only">
             <input id="nuEmail" type="email" placeholder="email@example.com" autocomplete="off">
             <input id="nuPass" type="text" placeholder="password (8+ characters)" autocomplete="off">
             <button class="btn btn-gold" id="nuAdd" type="button">Add user</button>
@@ -440,8 +441,10 @@ const TITLES={overview:"Overview",iqamah:"Iqamah schedule",announcements:"Announ
 /* ---- Admin users ---- */
 async function loadUsers(){
   const ul=$("usersList");
-  try{ const j=await write("users_list"); const me=(session()||{}).email;
-    ul.innerHTML=(j.users||[]).map(u=>'<li><span><b>'+esc(u.email)+'</b>'+(u.email===GRAND_EMAIL?' <em>grand admin</em>':u.email===me?' <em>you</em>':'')+(u.created?'<small>added '+esc(String(u.created).slice(0,10))+'</small>':'')+'</span>'+(u.email===me||u.email===GRAND_EMAIL?'':'<button class="btn btn-ghost btn-sm" data-del="'+esc(u.email)+'">Remove</button>')+'</li>').join("")||'<li class="muted">No users</li>';
+  const me=(session()||{}).email, iAmGrand=(me===GRAND_EMAIL);
+  document.querySelectorAll(".grand-only").forEach(el=>el.hidden=!iAmGrand); $("notGrandNote").hidden=iAmGrand;
+  try{ const j=await write("users_list");
+    ul.innerHTML=(j.users||[]).map(u=>'<li><span><b>'+esc(u.email)+'</b>'+(u.email===GRAND_EMAIL?' <em>grand admin</em>':u.email===me?' <em>you</em>':'')+(u.created?'<small>added '+esc(String(u.created).slice(0,10))+'</small>':'')+'</span>'+(u.email===me||u.email===GRAND_EMAIL||!iAmGrand?'':'<button class="btn btn-ghost btn-sm" data-del="'+esc(u.email)+'">Remove</button>')+'</li>').join("")||'<li class="muted">No users</li>';
     ul.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{ if(!confirm("Remove "+b.dataset.del+"? They will be signed out immediately.")) return; try{ await write("user_del",{email:b.dataset.del}); toast("User removed","ok"); loadUsers(); }catch(e){ toast(e.message,"bad"); } });
   }catch(e){ ul.innerHTML='<li class="muted">'+esc(e.message)+'</li>'; }
 }
@@ -745,5 +748,5 @@ const s=session(); if(s){ boot(s.email); if(s.grand) write("ping").then(j=>{ if(
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3839082dbe45d34',t:'MTc4ODkyOTM0Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a38399b5ca926e1b',t:'MTc4ODkyOTcyMw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
