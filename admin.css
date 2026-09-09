@@ -618,3 +618,4 @@ html[data-theme="dark"] .btn-wa{color:#4be38a}
 .ufrm{display:grid;grid-template-columns:1.4fr 1fr auto;gap:10px}.ufrm.col{grid-template-columns:1fr}
 .ufrm input{padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--card,#fff);color:inherit;min-width:0}
 @media(max-width:820px){.ufrm{grid-template-columns:1fr}}
+.grand-only[hidden],.not-grand[hidden]{display:none!important}
