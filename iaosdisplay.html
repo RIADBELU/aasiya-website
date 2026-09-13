@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en" data-board="iaos">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IAOS Regina — Prayer Times</title>
+<link rel="icon" type="image/png" href="assets/iaos-fav.png">
+<link rel="stylesheet" href="assets/sfpro.css">
+<style>
+/* ===== IAOS Regina board — 1:1 replica of the Islamic Association of Saskatchewan (Regina) display,
+   fed by the "IAOS Iqamah" / "IAOS Announcements" tabs of the Google Sheet ===== */
+:root{
+  --green:#0d5c4f; --green-2:#0a4a40; --green-3:#0f6a5b;
+  --peach:#f3d9c9; --peach-2:#f6e4d6; --row:#f6e2d3;
+  --ink:#151515; --ink-2:#333; --mute:#5a5a5a; --line:#e4e4e4; --card:#f2f2f2;
+  --font:"SF Pro Display","SF Pro Text",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#000;overflow:hidden}
+body{font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased}
+.frame{position:fixed;inset:0;display:flex;flex-direction:column;background:#fff}
+
+/* ---------- header (portrait) ---------- */
+.head{background:var(--green);color:#fff;padding:2.2vmin 3.2vmin 2.4vmin;position:relative}
+.head .org{text-align:center;font-size:2.35vmin;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.head .wifi{position:absolute;right:3.2vmin;top:2.3vmin;width:2.6vmin;height:2.6vmin;opacity:.85}
+.head .hrow{display:flex;justify-content:space-between;align-items:flex-end;margin-top:2.4vmin}
+.head .greet{font-size:3.1vmin;direction:rtl;font-family:"Noto Naskh Arabic","Amiri","Scheherazade New","Traditional Arabic",serif;line-height:1.3}
+.head .date{font-size:2.4vmin;font-weight:600;margin-top:1.2vmin;min-height:3vmin;letter-spacing:.01em}
+.head .date.hij{font-family:"Times New Roman",Georgia,serif;font-weight:700;letter-spacing:.02em}
+.head .clock{display:flex;align-items:flex-start;line-height:.9}
+.head .clock b{font-size:11.5vmin;font-weight:600;letter-spacing:-.02em}
+.head .clock small{display:flex;flex-direction:column;justify-content:space-between;height:8.4vmin;margin-left:1vmin;padding-top:.6vmin;font-size:3vmin;font-weight:600}
+.head .logo{display:none}
+
+/* ---------- next iqamah bar ---------- */
+.nextbar{background:var(--peach);display:flex;justify-content:center;align-items:baseline;gap:2.4vmin;padding:1.7vmin 2vmin;font-weight:600}
+.nextbar .lbl{font-size:2.5vmin;color:var(--ink-2)}
+.nextbar .cd{font-size:3.6vmin;font-weight:600;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+
+/* ---------- table ---------- */
+.table{flex:1;display:flex;flex-direction:column;padding:0 2.2vmin;min-height:0}
+.thead{display:grid;grid-template-columns:1fr 1.25fr 1.15fr;padding:2vmin 1.2vmin 1.4vmin;font-size:1.9vmin;font-weight:700;letter-spacing:.08em;color:var(--ink-2);border-bottom:.12vmin solid var(--line)}
+.thead span:nth-child(2),.thead span:nth-child(3){text-align:center}
+.rows{flex:1;display:flex;flex-direction:column;min-height:0}
+.row{flex:1;display:grid;grid-template-columns:1fr 1.25fr 1.15fr;align-items:center;padding:0 1.2vmin;border-bottom:.12vmin solid var(--line)}
+.row:last-child{border-bottom:0}
+.row.cur{background:var(--row);border-radius:.4vmin;border-bottom-color:transparent}
+.row .nm{font-size:5.4vmin;font-weight:600;letter-spacing:-.01em}
+.row .nm.ar{font-family:"Noto Naskh Arabic","Amiri","Scheherazade New","Traditional Arabic",serif;font-size:5.6vmin;font-weight:600;direction:rtl;text-align:left}
+.row .t{text-align:center;font-size:6.6vmin;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.row .t i{font-style:normal;font-size:2.2vmin;font-weight:700;margin-left:.9vmin;vertical-align:baseline}
+.row .t.txt{font-size:3.4vmin}
+
+/* ---------- cards ---------- */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6vmin;padding:1.6vmin 2.2vmin 1.8vmin}
+.card{background:var(--card);border-radius:1.4vmin;text-align:center;padding:1.5vmin 1vmin 1.4vmin}
+.card .k{font-size:1.85vmin;font-weight:700;letter-spacing:.08em;color:var(--ink-2)}
+.card .v{font-size:4.2vmin;font-weight:600;margin-top:.5vmin;letter-spacing:-.01em;white-space:nowrap}
+.card .v i{font-style:normal;font-size:1.7vmin;font-weight:700;margin-left:.6vmin}
+
+/* ---------- ticker ---------- */
+.ticker{background:var(--green);color:#fff;height:6.2vmin;display:flex;align-items:center;overflow:hidden;position:relative}
+.ticker .tlogo{flex:0 0 auto;width:6.2vmin;height:6.2vmin;padding:.6vmin;background:var(--green-2);display:flex;align-items:center;justify-content:center;z-index:2}
+.ticker .tlogo img{width:100%;height:100%;object-fit:contain}
+.ticker .win{flex:1;overflow:hidden;white-space:nowrap;position:relative;height:100%}
+.ticker .track{position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;white-space:nowrap;font-size:2.4vmin;font-weight:500;padding-left:100%;animation:tk var(--tk,40s) linear infinite}
+.ticker .track i{font-style:normal;margin:0 2.2vmin;opacity:.9}
+@keyframes tk{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+
+/* ---------- landscape-only parts ---------- */
+.lpanel,.stack,.strip,.side{display:none}
+
+/* ================= LANDSCAPE (photo 3) ================= */
+@media (orientation:landscape){
+  .frame{display:grid;grid-template-columns:minmax(0,1fr) 30vw;grid-template-rows:1fr auto auto;grid-template-areas:"left side" "strip side" "tick tick";background:#fff}
+  .head,.nextbar,.table,.cards{display:none}
+  .lpanel{display:flex;grid-area:left;min-width:0;background:#0b3d36;position:relative;overflow:hidden}
+  .side{grid-area:side;min-width:0;min-height:0;background:var(--green);color:#fff;display:flex;flex-direction:column;padding:1.4vmin 1.6vmin;gap:1vmin;overflow:hidden}
+  .sbox{flex:0 0 auto}
+  .stack{display:contents}
+  .side .org{font-size:1.55vmin;font-weight:700;letter-spacing:.04em;text-transform:uppercase;text-align:center;line-height:1.25}
+  .side .greet{text-align:center;font-size:2vmin;direction:rtl;font-family:"Noto Naskh Arabic","Amiri","Scheherazade New","Traditional Arabic",serif;opacity:.95}
+  .side .clock{display:flex;justify-content:center;align-items:flex-start;line-height:.9;margin-top:.6vmin}
+  .side .clock b{font-size:8.6vmin;font-weight:600;letter-spacing:-.02em}
+  .side .clock small{display:flex;flex-direction:column;justify-content:space-between;height:6.3vmin;margin-left:.8vmin;padding-top:.5vmin;font-size:2.4vmin;font-weight:600}
+  .side .dates{text-align:center;font-size:1.9vmin;font-weight:600;line-height:1.35}
+  .sbox{border:.15vmin solid rgba(255,255,255,.28);border-radius:1.2vmin;padding:1.2vmin 1.4vmin;text-align:center}
+  .sbox .k{font-size:1.45vmin;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.9}
+  .sbox .v{font-size:3.9vmin;font-weight:600;letter-spacing:.02em;margin-top:.3vmin;font-variant-numeric:tabular-nums}
+  .sbox.verse{flex:1;display:flex;flex-direction:column;justify-content:center;min-height:0}
+  .sbox.verse .k{color:#e6c979}
+  .sbox.verse .ref{font-size:1.4vmin;opacity:.85;margin-top:.2vmin}
+  .sbox.verse .ar{font-family:"Noto Naskh Arabic","Amiri","Scheherazade New","Traditional Arabic",serif;font-size:3.2vmin;line-height:1.7;direction:rtl;margin:1.2vmin 0 .8vmin}
+  .sbox.verse .en{font-size:2vmin;font-weight:500;line-height:1.35;opacity:.96}
+  .sbox.sun .v{font-size:2.6vmin}
+  .jum2{display:grid;grid-template-columns:1fr 1fr;gap:1.2vmin}
+  .jum2 .sbox .v{font-size:2.3vmin}
+  .side .v i{font-style:normal;font-size:.55em;font-weight:700;margin-left:.4em}
+
+  .strip{display:grid;grid-area:strip;min-width:0;grid-template-columns:repeat(5,minmax(0,1fr));background:#fff;border-top:.15vmin solid var(--line)}
+  .strip .p{padding:1.4vmin .6vmin 1.2vmin;text-align:center;min-width:0;overflow:hidden;border-right:.12vmin solid var(--line)}
+  .strip .p:last-child{border-right:0}
+  .strip .p.cur{background:#eeeeee}
+  .strip .p .n{font-size:2.2vmin;font-weight:600;color:var(--ink)}
+  .strip .p .n.ar{font-family:"Noto Naskh Arabic","Amiri","Scheherazade New","Traditional Arabic",serif;direction:rtl}
+  .strip .p .bi{margin-top:.6vmin;font-size:1.45vmin;color:var(--mute);font-weight:500;display:flex;justify-content:center;gap:1.2vmin;white-space:nowrap}
+  .strip .p .bi b{color:var(--ink);font-weight:600;font-size:1.75vmin;margin-left:.4vmin}
+  .ticker{grid-area:tick;height:4.6vmin}
+  .ticker .tlogo{width:4.6vmin;height:4.6vmin}
+  .ticker .track{font-size:1.85vmin}
+
+  /* left panel: rotating announcement cards */
+  .lpanel .slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:6vmin 7vmin;opacity:0;transition:opacity .8s}
+  .lpanel .slide.on{opacity:1}
+  .lpanel .slide .box{background:#fff;color:var(--ink);border-radius:2.4vmin;padding:5vmin 6vmin;max-width:100%;box-shadow:0 2vmin 6vmin rgba(0,0,0,.35);text-align:center}
+  .lpanel .slide .box .tag{display:inline-block;background:var(--green);color:#fff;border-radius:99vmin;padding:.7vmin 2vmin;font-size:1.6vmin;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  .lpanel .slide .box .msg{margin-top:2.6vmin;font-size:4.2vmin;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+  .lpanel .slide .box .msg.long{font-size:3.2vmin}
+  .lpanel .slide .box .msg.xlong{font-size:2.5vmin}
+  .lpanel .brand{position:absolute;left:3vmin;bottom:2.4vmin;display:flex;align-items:center;gap:1.2vmin;color:#fff;opacity:.85}
+  .lpanel .brand img{width:4.6vmin;height:4.6vmin;object-fit:contain}
+  .lpanel .brand span{font-size:1.7vmin;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+  .lpanel .dots{position:absolute;right:3vmin;bottom:3vmin;display:flex;gap:.8vmin}
+  .lpanel .dots i{width:1.1vmin;height:1.1vmin;border-radius:50%;background:rgba(255,255,255,.35)}
+  .lpanel .dots i.on{background:#e6c979}
+}
+
+/* ---------- status box (Adhan / Iqamah time) ---------- */
+.scrim{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:50;background:rgba(0,0,0,.28);backdrop-filter:blur(1.4vmin);-webkit-backdrop-filter:blur(1.4vmin);opacity:0;transition:opacity .5s}
+.scrim.on{display:flex;opacity:1}.scrim.out{opacity:0}
+.iqbox{background:#fff;color:var(--ink);border-radius:2.4vmin;padding:5vmin 7vmin;text-align:center;box-shadow:0 3vmin 8vmin rgba(0,0,0,.4);min-width:56vmin}
+.iqbox .h{font-size:6.4vmin;font-weight:700;letter-spacing:-.02em}
+.iqbox .a{font-family:"Noto Naskh Arabic","Amiri","Scheherazade New","Traditional Arabic",serif;font-size:5vmin;color:var(--green);margin-top:.6vmin;direction:rtl}
+.iqbox .p{font-size:3.2vmin;font-weight:600;color:var(--mute);margin-top:1.6vmin}
+
+/* ---------- back tab ---------- */
+.back{position:fixed;left:0;top:0;z-index:60;background:rgba(0,0,0,.65);color:#fff;text-decoration:none;font-size:1.9vmin;font-weight:600;padding:.9vmin 1.8vmin;border-radius:0 0 1.2vmin 0;opacity:0;transform:translateY(-100%);transition:.25s}
+.back:hover,.back.show{opacity:1;transform:none}
+  .hot{position:fixed;left:0;top:0;width:12vmin;height:8vmin;z-index:59}
+  .hot:hover+.back{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div class="hot"></div><a class="back" id="back" href="index.html">← Go to website</a>
+
+<div class="frame">
+  <!-- ===== portrait header ===== -->
+  <header class="head">
+    <div class="org" id="orgP">Islamic Association of Saskatchewan — Regina</div>
+    <svg class="wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8.8a15 15 0 0 1 20 0M5.5 12.3a10 10 0 0 1 13 0M9 15.8a5 5 0 0 1 6 0"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></svg>
+    <div class="hrow">
+      <div>
+        <div class="greet">أهلاً وسهلاً بكم في بيت الله</div>
+        <div class="date" id="dateP"></div>
+      </div>
+      <div class="clock"><b id="clockP">--:--</b><small><span id="secP">--</span><span id="apP">--</span></small></div>
+    </div>
+  </header>
+  <div class="nextbar"><span class="lbl" id="nextLblP">Next Iqamah: —</span><span class="cd" id="cdP">-- HR -- MIN -- SEC</span></div>
+  <div class="table">
+    <div class="thead"><span>PRAYER</span><span>BEGINS</span><span>IQAMAH</span></div>
+    <div class="rows" id="rows"></div>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="k">SUNRISE</div><div class="v" id="sunP">—</div></div>
+    <div class="card"><div class="k">JUMMAH 1</div><div class="v" id="j1P">—</div></div>
+    <div class="card"><div class="k">JUMMAH 2</div><div class="v" id="j2P">—</div></div>
+  </div>
+
+  <!-- ===== landscape ===== -->
+  <section class="lpanel" id="lpanel">
+    <div class="brand"><img src="assets/iaos-logo-white.png" alt=""><span>IAOS Regina</span></div>
+    <div class="dots" id="dots"></div>
+  </section>
+  <aside class="side">
+    <div class="org">Islamic Association of Saskatchewan — Regina</div>
+    <div class="greet">أهلاً وسهلاً بكم في بيت الله</div>
+    <div class="clock"><b id="clockL">--:--</b><small><span id="secL">--</span><span id="apL">--</span></small></div>
+    <div class="dates"><div id="gregL"></div><div id="hijL"></div></div>
+    <div class="sbox"><div class="k" id="nextLblL">Next Iqamah • —</div><div class="v" id="cdL">-- HR -- MIN -- SEC</div></div>
+    <div class="sbox verse"><div class="k">Verse of the Day</div><div class="ref" id="vRef"></div><div class="ar" id="vAr"></div><div class="en" id="vEn"></div></div>
+    <div class="sbox sun"><div class="k">Sunrise</div><div class="v" id="sunL">—</div></div>
+    <div class="jum2"><div class="sbox"><div class="k">Jummah 1</div><div class="v" id="j1L">—</div></div><div class="sbox"><div class="k">Jummah 2</div><div class="v" id="j2L">—</div></div></div>
+  </aside>
+  <div class="strip" id="strip"></div>
+
+  <!-- ===== ticker (both) ===== -->
+  <footer class="ticker"><div class="tlogo"><img src="assets/iaos-logo-white.png" alt="IAOS Regina"></div><div class="win"><div class="track" id="track"></div></div></footer>
+</div>
+
+<div class="scrim" id="scrim"><div class="iqbox"><div class="h" id="iqBoxHeadline">Iqamah Time</div><div class="a" id="iqBoxAr">الإقامة</div><div class="p" id="iqBoxPrayer"></div></div></div>
+
+<script src="site.js"></script>
+<script>
+(function(){
+const A=window.Aasiya, $=id=>document.getElementById(id);
+let DAY=null, DAYKEY="", TOMORROW=null;
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+const HM={1:"Muharram",2:"Safar",3:"Rabi Al-Awwal",4:"Rabi Al-Akhar",5:"Jumada Al-Ula",6:"Jumada Al-Akhirah",7:"Rajab",8:"Sha'ban",9:"Ramadan",10:"Shawwal",11:"Dhul Qa'dah",12:"Dhul Hijjah"};
+function hijriParts(h){ if(!h) return null; const d=+h.day+Math.round(A.CFG.hijriOffset||0); return {d, m:HM[+h.month.number]||h.month.en, y:h.year}; }
+function seg(h){ if(h==null) return "—"; const t=A.fmtTime(h); const m=t.match(/^(.*?)\s*(AM|PM)$/i); return m?m[1]+"<i>"+m[2].toUpperCase()+"</i>":t; }
+function jum(j){ if(!j) return "—"; if(j.hours!=null) return seg(j.hours); return j.text?esc(j.text):"—"; }
+function hms(secs){ secs=Math.max(0,secs|0); return A.pad2(Math.floor(secs/3600))+" HR "+A.pad2(Math.floor(secs%3600/60))+" MIN "+A.pad2(secs%60)+" SEC"; }
+
+/* the IAOS board highlights the prayer that is "current" (until 10 min after its iqamah — same rule as the other boards) */
+function curIndex(n){ return A.focusIndex(DAY,n.hours); }
+/* next iqamah = first prayer whose iqamah is still ahead */
+function nextIq(n){
+  for(const p of DAY.prayers){ if(p.iq!=null&&p.iq>n.hours) return {p,h:p.iq}; }
+  if(TOMORROW){ const p=TOMORROW.prayers[0]; if(p.iq!=null) return {p,h:p.iq+24}; }
+  return null;
+}
+let arabic=false; setInterval(()=>{ arabic=!arabic; renderRows(); },Math.max(3,A.CFG.nameSwapSeconds||10)*1000);
+
+function renderRows(){
+  if(!DAY){ $("rows").innerHTML=""; $("strip").innerHTML=""; return; }
+  const n=A.mosqueNow(), ci=curIndex(n);
+  $("rows").innerHTML=DAY.prayers.map((p,i)=>'<div class="row'+(i===ci?" cur":"")+'" data-i="'+i+'"><span class="nm'+(arabic?" ar":"")+'">'+(arabic?p.ar:p.label)+'</span><span class="t">'+seg(p.begin)+'</span><span class="t'+(p.iq==null?" txt":"")+'">'+(p.iq!=null?seg(p.iq):esc(p.iqText||"—"))+'</span></div>').join("");
+  $("strip").innerHTML=DAY.prayers.map((p,i)=>'<div class="p'+(i===ci?" cur":"")+'"><div class="n'+(arabic?" ar":"")+'">'+(arabic?p.ar:p.label)+'</div><div class="bi"><span>Begins<b>'+A.fmtTime(p.begin)+'</b></span><span>Iqamah<b>'+(p.iq!=null?A.fmtTime(p.iq):esc(p.iqText||"—"))+'</b></span></div></div>').join("");
+  $("sunP").innerHTML=$("sunL").innerHTML=seg(DAY.sunrise);
+  const j=DAY.jummah||[]; $("j1P").innerHTML=$("j1L").innerHTML=jum(j[0]); $("j2P").innerHTML=$("j2L").innerHTML=jum(j[1]);
+}
+
+/* portrait header date alternates Gregorian / Hijri every few seconds (as on the real board) */
+function renderDates(n){
+  const g=new Date().toLocaleDateString("en-US",{timeZone:"America/Regina",weekday:"long",month:"long",day:"numeric",year:"numeric"});
+  const h=DAY?hijriParts(DAY.hijri):null;
+  const showH=h&&Math.floor(Date.now()/6000)%2===1;
+  const dp=$("dateP"); dp.classList.toggle("hij",!!showH); dp.textContent=showH?(h.m+" "+h.y+" "+h.d):g;
+  $("gregL").textContent=g; $("hijL").textContent=h?(h.d+" "+h.m+" "+h.y):"";
+}
+
+/* ticker */
+function renderTicker(){
+  const n=A.mosqueNow(), list=A.activeAnnouncements(n).map(a=>a.message);
+  if(!list.length) list.push("Welcome to IAOS Regina — Islamic Association of Saskatchewan (Regina) Inc.");
+  const html=list.map(t=>esc(t)+"<i>•</i>").join("");
+  const tr=$("track"); if(tr.dataset.html!==html){ tr.innerHTML=html; tr.dataset.html=html; const chars=list.join(" ").length; tr.style.setProperty("--tk",Math.max(20,Math.round(chars/6+18))+"s"); }
+  renderSlides(list);
+}
+/* landscape left panel: announcement cards */
+let SLIDES=[], slideI=0, slideT=null;
+function renderSlides(list){
+  const key=list.join("\u0001"); const lp=$("lpanel"); if(lp.dataset.key===key) return; lp.dataset.key=key;
+  lp.querySelectorAll(".slide").forEach(e=>e.remove()); SLIDES=list;
+  list.forEach((t,i)=>{ const d=document.createElement("div"); d.className="slide"+(i===0?" on":""); const L=t.length; d.innerHTML='<div class="box"><span class="tag">Announcement</span><div class="msg'+(L>160?" xlong":L>90?" long":"")+'">'+esc(t)+'</div></div>'; lp.insertBefore(d,lp.firstChild); });
+  $("dots").innerHTML=list.length>1?list.map((_,i)=>'<i class="'+(i===0?"on":"")+'"></i>').join(""):"";
+  slideI=0; clearInterval(slideT); if(list.length>1) slideT=setInterval(()=>{ slideI=(slideI+1)%list.length; lp.querySelectorAll(".slide").forEach((e,k)=>e.classList.toggle("on",list.length-1-k===slideI)); $("dots").querySelectorAll("i").forEach((e,k)=>e.classList.toggle("on",k===slideI)); },Math.max(5,A.CFG.tickerSeconds||12)*1000);
+}
+
+/* verse of the day (alquran.cloud, cached per day) */
+function verse(n){
+  const key="iaos.verse."+n.y+"-"+n.m+"-"+n.d;
+  const paint=v=>{ $("vRef").textContent=v.ref; $("vAr").textContent=v.ar; $("vEn").textContent=v.en; };
+  try{ const c=JSON.parse(localStorage.getItem(key)||"null"); if(c){ paint(c); return; } }catch(e){}
+  const start=Date.UTC(n.y,0,0), doy=Math.round((Date.UTC(n.y,n.m-1,n.d)-start)/864e5);
+  const ayah=1+((doy*37+n.y)%6236);
+  fetch("https://api.alquran.cloud/v1/ayah/"+ayah+"/editions/quran-uthmani,en.sahih").then(r=>r.json()).then(j=>{
+    const a=j.data[0], e=j.data[1]; const v={ref:a.surah.englishName+" • "+a.surah.number+":"+a.numberInSurah, ar:a.text, en:e.text};
+    try{ localStorage.setItem(key,JSON.stringify(v)); }catch(err){} paint(v);
+  }).catch(()=>{});
+}
+
+/* status box */
+let iqBoxUntil=0, iqBoxSeen={}, iqBoxFading=false;
+function statusBox(n){
+  if(!DAY) return; const boxMs=Math.max(1,A.CFG.iqamahBoxSeconds||60)*1000;
+  DAY.prayers.forEach(p=>{ [["begin",p.begin],["iqamah",p.iq]].forEach(([type,h])=>{ if(h==null) return; const since=(n.hours-h)*3600; const key=DAYKEY+"|"+p.key+"|"+type;
+    if(since>=0&&since*1000<boxMs&&!iqBoxSeen[key]){ iqBoxSeen[key]=true; iqBoxUntil=Date.now()+(boxMs-since*1000); const ad=type==="begin";
+      $("iqBoxHeadline").textContent=ad?"Adhan Time":"Iqamah Time"; $("iqBoxAr").textContent=ad?"الأذان":"الإقامة"; $("iqBoxPrayer").textContent=p.label+" • "+A.fmtTime(h); } }); });
+  const scrim=$("scrim");
+  if(Date.now()<iqBoxUntil){ scrim.classList.add("on"); scrim.classList.remove("out"); iqBoxFading=false; }
+  else if(scrim.classList.contains("on")&&!iqBoxFading){ iqBoxFading=true; scrim.classList.add("out"); setTimeout(()=>{ scrim.classList.remove("on","out"); iqBoxFading=false; },500); }
+}
+
+function tick(){
+  const n=A.mosqueNow(), key=n.y+"-"+n.m+"-"+n.d;
+  if(key!==DAYKEY){ DAY=A.buildDay(n); DAYKEY=DAY?key:""; renderRows(); ensureAdhan(n); renderTicker(); verse(n); }
+  const h12=n.h%12||12, ap=n.h<12?"AM":"PM", c=h12+":"+A.pad2(n.mi);
+  $("clockP").textContent=$("clockL").textContent=c; $("secP").textContent=$("secL").textContent=A.pad2(n.s); $("apP").textContent=$("apL").textContent=ap;
+  renderDates(n);
+  if(!DAY) return;
+  statusBox(n);
+  const nx=nextIq(n);
+  if(nx){ $("nextLblP").textContent="Next Iqamah: "+nx.p.label+" "+A.fmtTime(nx.h); $("nextLblL").textContent="Next Iqamah • "+nx.p.label; $("cdP").textContent=$("cdL").textContent=hms(Math.round((nx.h-n.hours)*3600)); }
+  const cur=document.querySelector("#rows .row.cur"); const idx=cur?+cur.dataset.i:-1; if(idx!==curIndex(n)) renderRows();
+}
+function ensureAdhan(n){
+  const nm=n.m===12?{y:n.y+1,m:1}:{y:n.y,m:n.m+1};
+  Promise.all([A.fetchAdhan(n.y,n.m),A.fetchAdhan(nm.y,nm.m)]).then(()=>{
+    if(!DAY){ DAY=A.buildDay(n); DAYKEY=DAY?n.y+"-"+n.m+"-"+n.d:""; renderRows(); }
+    const d=new Date(Date.UTC(n.y,n.m-1,n.d+1)); TOMORROW=A.buildDay({y:d.getUTCFullYear(),m:d.getUTCMonth()+1,d:d.getUTCDate()});
+    renderTicker();
+  }).catch(()=>{});
+}
+function sync(){ A.fetchSheet().then(()=>{ A.applySettings(); DAYKEY=""; tick(); }).catch(()=>{ renderTicker(); }); }
+A.applySettings(); ensureAdhan(A.mosqueNow()); sync(); tick();
+setInterval(tick,1000); setInterval(sync,5*60*1000);
+setTimeout(()=>{ tick(); },1000-(Date.now()%1000));
+
+/* back tab: touch tap reveals; second tap follows the link */
+const back=$("back"); let shown=0;
+document.addEventListener("touchstart",e=>{ if(e.touches[0].clientY<60&&e.touches[0].clientX<160){ back.classList.add("show"); shown=Date.now(); setTimeout(()=>back.classList.remove("show"),4000); } },{passive:true});
+back.addEventListener("click",e=>{ if(Date.now()-shown<700&&matchMedia("(hover:none)").matches) e.preventDefault(); });
+if(document.referrer&&new URL(document.referrer).origin===location.origin) back.textContent="← Back to website";
+})();
+/* F = toggle fullscreen */
+addEventListener("keydown",e=>{ if((e.key==="f"||e.key==="F")&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>{}); } });
+</script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3aa33c6ecd158a4',t:'MTc4OTMzNDQ5Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
