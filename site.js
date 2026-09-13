@@ -18,11 +18,17 @@ const PRAYERS=[
   {key:"maghrib",label:"Maghrib",ar:"المغرب"},
   {key:"isha",   label:"Isha",   ar:"العشاء"}];
 
-const SHEET_CACHE="aasiya.site.sheet.v1", ADHAN_CACHE="aasiya.aladhan.cache.v1";
+const BOARDS={aasiya:{iq:"Iqamah",ann:"Announcements",name:"Aasiya Musalla"},iaos:{iq:"IAOS Iqamah",ann:"IAOS Announcements",name:"IAOS Regina"}};
+let BOARD=(function(){ try{ const q=new URLSearchParams(location.search).get("board"); if(q&&BOARDS[q]) return q; const b=document.documentElement.getAttribute("data-board"); if(b&&BOARDS[b]) return b; }catch(e){} return "aasiya"; })();
+const ADHAN_CACHE="aasiya.aladhan.cache.v1";
+function cacheKey(){ return BOARD==="aasiya"?"aasiya.site.sheet.v1":"aasiya.site.sheet."+BOARD+".v1"; }
 let SHEET={iqamah:[],announcements:[],settings:[],fetchedAt:0,live:false};
+function loadCache(){ SHEET={iqamah:[],announcements:[],settings:[],fetchedAt:0,live:false}; try{ const c=JSON.parse(localStorage.getItem(cacheKey())||"null"); if(c&&c.iqamah) SHEET=Object.assign(SHEET,c,{live:false}); }catch(e){} }
+function setBoard(b){ if(!BOARDS[b]||b===BOARD) return BOARD; BOARD=b; loadCache(); applySettings(); return BOARD; }
+function board(){ return BOARD; }
 let ADHAN={};   // "YYYY-M" -> array of day objects from AlAdhan
 
-try{ const c=JSON.parse(localStorage.getItem(SHEET_CACHE)||"null"); if(c&&c.iqamah) SHEET=Object.assign(SHEET,c,{live:false}); }catch(e){}
+loadCache();
 try{ ADHAN=JSON.parse(localStorage.getItem(ADHAN_CACHE)||"{}")||{}; }catch(e){ ADHAN={}; }
 
 /* ---- 2. Time helpers ---- */
@@ -82,12 +88,12 @@ function applySettings(){
 
 /* ---- 4. Data fetch ---- */
 function fetchSheet(){
-  const ranges=["Iqamah!A1:Z400","Announcements!A1:Z400","Settings!A1:Z200"].map(r=>"ranges="+encodeURIComponent(r)).join("&");
+  const B=BOARDS[BOARD]; const ranges=[B.iq+"!A1:Z400",B.ann+"!A1:Z400","Settings!A1:Z200"].map(r=>"ranges="+encodeURIComponent(r)).join("&");
   const url="https://sheets.googleapis.com/v4/spreadsheets/"+SHEET_ID+"/values:batchGet?"+ranges+"&majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE&key="+API_KEY;
   return fetch(url,{cache:"no-store"}).then(r=>{ if(!r.ok) throw new Error("sheet "+r.status); return r.json(); }).then(j=>{
     const vr=j.valueRanges||[]; const strip=g=>(g&&g.values||[]).slice(1).filter(r=>r.some(c=>String(c||"").trim()));
     SHEET={iqamah:strip(vr[0]),announcements:strip(vr[1]),settings:strip(vr[2]),fetchedAt:Date.now(),live:true};
-    try{ localStorage.setItem(SHEET_CACHE,JSON.stringify(SHEET)); }catch(e){}
+    try{ localStorage.setItem(cacheKey(),JSON.stringify(SHEET)); }catch(e){}
     applySettings(); return SHEET;
   });
 }
@@ -115,7 +121,8 @@ function buildDay(n){
     const iq=resolveIqamah(row[i+1],t[p.key],dflt);
     return Object.assign({},p,{begin:t[p.key],iq:iq.hours,iqText:iq.text});
   });
-  return {prayers:out,sunrise:t.sunrise,sunset:t.maghrib,hijri:t.hijri};
+  const jm=k=>{ const c=row[k]; if(c==null||!String(c).trim()) return {hours:null,text:""}; const r=resolveIqamah(c,12,"—"); return r; };
+  return {prayers:out,sunrise:t.sunrise,sunset:t.maghrib,hijri:t.hijri,jummah:[jm(6),jm(7)]};
 }
 function focusIndex(day,now){
   // Same rule as the TV: a prayer stays "current" until highlightHoldMinutes after its iqamah.
@@ -145,5 +152,5 @@ function announcementState(a,n){
 }
 
 /* ---- 7. Public API ---- */
-window.Aasiya={CFG,PRAYERS,SHEET:()=>SHEET,mosqueNow,fmtTime,pad2,fetchSheet,fetchAdhan,buildDay,focusIndex,hijriText,activeAnnouncements,announcementState,parseDateKey,applySettings,SHEET_ID,timesFor,resolveIqamah,iqamahRowFor};
+window.Aasiya={CFG,BOARDS,board,setBoard,PRAYERS,SHEET:()=>SHEET,mosqueNow,fmtTime,pad2,fetchSheet,fetchAdhan,buildDay,focusIndex,hijriText,activeAnnouncements,announcementState,parseDateKey,applySettings,SHEET_ID,timesFor,resolveIqamah,iqamahRowFor};
 })();
