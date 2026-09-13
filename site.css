@@ -557,3 +557,16 @@ html[data-theme="dark"] .wtable thead th{background:rgba(255,255,255,.04)}
 @media (prefers-reduced-motion:reduce){.hero-orbs i,.hero .wrap>div:first-child>*,.hero .pcard{animation:none}}
 @media print{.pbar,.changes,.hero-orbs,.hstats{display:none!important}}
 .btn[hidden]{display:none!important}
+
+/* chooser dropdown groups v6 */
+.dd{border:1px solid var(--line);border-radius:14px;margin-top:12px;background:var(--paper);overflow:hidden}
+.dd summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 18px;user-select:none}
+.dd summary::-webkit-details-marker{display:none}
+.dd summary b{font-size:16px;color:var(--green-2)}
+.dd summary span{font-size:13px;color:var(--muted);flex:1}
+.dd summary i{width:10px;height:10px;border-right:2px solid var(--green-2);border-bottom:2px solid var(--green-2);transform:rotate(-45deg);transition:transform .2s;margin-right:4px}
+.dd[open] summary i{transform:rotate(45deg)}
+.dd .choose-grid{padding:4px 14px 16px}
+.dd .choice{background:#fff}
+.choice span .ci{width:22px;height:22px;vertical-align:middle;margin-right:8px;background:var(--green-2);border-radius:6px;padding:2px}
+html[data-theme="dark"] .dd{background:#0f1c1a}html[data-theme="dark"] .dd summary b,html[data-theme="dark"] .dd summary i{color:var(--gold);border-color:var(--gold)}html[data-theme="dark"] .dd .choice{background:#132522}
