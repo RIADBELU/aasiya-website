@@ -619,3 +619,9 @@ html[data-theme="dark"] .btn-wa{color:#4be38a}
 .ufrm input{padding:11px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--card,#fff);color:inherit;min-width:0}
 @media(max-width:820px){.ufrm{grid-template-columns:1fr}}
 .grand-only[hidden],.not-grand[hidden]{display:none!important}
+
+/* board switch v8 */
+.board-seg{margin-right:6px}.board-seg button{padding:6px 11px;font-size:12.5px}
+body[data-board="iaos"] .board-seg button.on{background:var(--green-2);color:#fff}
+.iqrow.jum .begin{color:var(--muted);font-weight:600}
+@media (max-width:640px){.board-seg{order:-1;width:100%;justify-content:center}}
