@@ -18,7 +18,7 @@ const PRAYERS=[
   {key:"maghrib",label:"Maghrib",ar:"المغرب"},
   {key:"isha",   label:"Isha",   ar:"العشاء"}];
 
-const BOARDS={aasiya:{iq:"Iqamah",ann:"Announcements",name:"Aasiya Musalla"},iaos:{iq:"IAOS Iqamah",ann:"IAOS Announcements",name:"IAOS Regina"}};
+const BOARDS={aasiya:{iq:"Iqamah",ann:"Announcements",set:"Settings",name:"Aasiya Musalla"},iaos:{iq:"IAOS Iqamah",ann:"IAOS Announcements",set:"IAOS Settings",name:"IAOS Regina"}};
 let BOARD=(function(){ try{ const q=new URLSearchParams(location.search).get("board"); if(q&&BOARDS[q]) return q; const b=document.documentElement.getAttribute("data-board"); if(b&&BOARDS[b]) return b; }catch(e){} return "aasiya"; })();
 const ADHAN_CACHE="aasiya.aladhan.cache.v1";
 function cacheKey(){ return BOARD==="aasiya"?"aasiya.site.sheet.v1":"aasiya.site.sheet."+BOARD+".v1"; }
@@ -88,7 +88,7 @@ function applySettings(){
 
 /* ---- 4. Data fetch ---- */
 function fetchSheet(){
-  const B=BOARDS[BOARD]; const ranges=[B.iq+"!A1:Z400",B.ann+"!A1:Z400","Settings!A1:Z200"].map(r=>"ranges="+encodeURIComponent(r)).join("&");
+  const B=BOARDS[BOARD]; const ranges=[B.iq+"!A1:Z400",B.ann+"!A1:Z400",B.set+"!A1:Z200"].map(r=>"ranges="+encodeURIComponent(r)).join("&");
   const url="https://sheets.googleapis.com/v4/spreadsheets/"+SHEET_ID+"/values:batchGet?"+ranges+"&majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE&key="+API_KEY;
   return fetch(url,{cache:"no-store"}).then(r=>{ if(!r.ok) throw new Error("sheet "+r.status); return r.json(); }).then(j=>{
     const vr=j.valueRanges||[]; const strip=g=>(g&&g.values||[]).slice(1).filter(r=>r.some(c=>String(c||"").trim()));
