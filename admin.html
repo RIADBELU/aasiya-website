@@ -239,7 +239,7 @@
     <section class="view" data-view="display" hidden>
       <div class="cols set-cols">
         <div class="panel">
-          <div class="panel-h"><h2>TV display settings</h2><span class="hint">Saved to the “Settings” tab · the TV picks changes up within <span id="setRefresh">5</span> min</span></div>
+          <div class="panel-h"><h2>TV display settings</h2><span class="hint">Saved to the “<span data-settab>Settings</span>” tab · the TV picks changes up within <span id="setRefresh">5</span> min</span></div>
           <form id="setForm" class="setform">
             <div id="setGroups"></div>
             <div class="formfoot sticky">
@@ -282,14 +282,14 @@
             <div><span>Google Sheet</span><a id="sheetLink2" target="_blank" rel="noopener">Open in Google Sheets ↗</a></div>
             <div><span>Iqamah tab</span><code>date, fajr, dhuhr, asr, maghrib, isha</code></div>
             <div><span>Announcements tab</span><code>message, startDate, endDate</code></div>
-            <div><span>Settings tab</span><code>key, value</code> — display options (ticker speed, etc.)</div>
+            <div><span><span data-settab>Settings</span> tab</span><code>key, value</code> — display options (ticker speed, etc.)</div>
             <div><span>Adhan times</span>AlAdhan (ISNA) for Regina — automatic, never edited</div>
           </div>
         </div>
         <div class="panel">
           <div class="panel-h"><h2>Raw “Iqamah” tab</h2><span class="hint">read-only</span></div>
           <div class="rawwrap"><table class="tbl raw" id="rawIq"></table></div>
-          <div class="panel-h" style="margin-top:22px"><h2>Raw “Settings” tab</h2><span class="hint">read-only</span></div>
+          <div class="panel-h" style="margin-top:22px"><h2>Raw “<span data-settab>Settings</span>” tab</h2><span class="hint">read-only</span></div>
           <div class="rawwrap"><table class="tbl raw" id="rawSet"></table></div>
         </div>
       </div>
@@ -506,7 +506,7 @@ async function loadAll(){
   renderOverview(); renderIqamah(); renderAnn(); renderSettings(); renderSheet(); paintConn();
 }
 /* ---- Board switch (Aasiya Musalla / IAOS Regina) ---- */
-function paintBoard(){ document.querySelectorAll("#boardSeg button").forEach(b=>b.classList.toggle("on",b.dataset.board===A.board())); document.body.dataset.board=A.board(); $("viewSub").textContent=(A.board()==="iaos"?"IAOS Regina board":"Aasiya Musalla")+" · Regina, SK"; document.querySelectorAll(".tvlink").forEach(a=>a.href=A.board()==="iaos"?"iaosdisplay.html":"prayerdisplay.html"); }
+function paintBoard(){ document.querySelectorAll("#boardSeg button").forEach(b=>b.classList.toggle("on",b.dataset.board===A.board())); document.body.dataset.board=A.board(); document.querySelectorAll("[data-settab]").forEach(e=>e.textContent=A.BOARDS[A.board()].set); if($("pvFrame").getAttribute("src")){ pvReset(); if(location.hash==="#display") pvEnsure(); } $("viewSub").textContent=(A.board()==="iaos"?"IAOS Regina board":"Aasiya Musalla")+" · Regina, SK"; document.querySelectorAll(".tvlink").forEach(a=>a.href=A.board()==="iaos"?"iaosdisplay.html":"prayerdisplay.html"); }
 document.querySelectorAll("#boardSeg button").forEach(b=>b.onclick=async()=>{ if(b.dataset.board===A.board()) return; if((DIRTY||SET_DIRTY)&&!confirm("You have unsaved changes. Switch board anyway?")) return; DIRTY=false; SET_DIRTY=false; EDIT=null; CUR_SCHED=0; A.setBoard(b.dataset.board); try{ localStorage.setItem("aasiya.admin.board",A.board()); }catch(e){} paintBoard(); await loadAll(); toast("Now editing the "+(A.board()==="iaos"?"IAOS Regina":"Aasiya Musalla")+" board"); });
 try{ const bb=localStorage.getItem("aasiya.admin.board"); if(bb) A.setBoard(bb); }catch(e){} paintBoard();
 $("reloadBtn").onclick=()=>{ if((DIRTY||SET_DIRTY)&&!confirm("You have unsaved changes. Reload anyway?")) return; DIRTY=false; SET_DIRTY=false; loadAll().then(()=>toast("Data reloaded")); };
@@ -653,7 +653,7 @@ function renderSheet(){
     ["Adhan times (AlAdhan)", !!TODAY, TODAY?"Loaded for this month":"Not loaded"],
     ["Iqamah tab", (s.iqamah||[]).length>0, (s.iqamah||[]).length+" schedule row(s)"],
     ["Announcements tab", true, (s.announcements||[]).length+" row(s)"],
-    ["Settings tab", true, (s.settings||[]).length+" key(s)"]];
+    [A.BOARDS[A.board()].set+" tab", true, (s.settings||[]).length+" key(s)"]];
   $("health").innerHTML=items.map(([k,ok,d])=>'<li class="'+(ok===true?"ok":ok===false?"bad":"")+'"><i></i><div><b>'+k+'</b><span>'+esc(d)+'</span></div></li>').join("");
   const grid=(rows,head)=>'<thead><tr>'+head.map(h=>'<th>'+h+'</th>').join("")+'</tr></thead><tbody>'+(rows.length?rows.map(r=>'<tr>'+head.map((_,i)=>'<td>'+esc(r[i]||"")+'</td>').join("")+'</tr>').join(""):'<tr><td colspan="'+head.length+'" class="muted">empty</td></tr>')+'</tbody>';
   $("rawIq").innerHTML=grid(s.iqamah||[],["date","fajr","dhuhr","asr","maghrib","isha"]);
@@ -737,18 +737,20 @@ $("setForm").addEventListener("submit",async e=>{
     if(PENDING_DEFAULT.has(it.k)) del.push(it.k); else { const v=vals[it.k]; if(v==null||v==="") return; if(it.t==="num"||it.t==="range"){ if(v<it.min||v>it.max){ toast(it.l+" must be between "+it.min+" and "+it.max,"bad"); throw new Error("range"); } } put[it.k]= it.t==="bool"?(v?"true":"false"):String(v); } });
   $("setSave").disabled=true; $("setMsg").textContent="Saving…";
   try{
-    if(Object.keys(put).length) await write("settings_set",{settings:put});
-    if(del.length) await write("settings_del",{keys:del});
+    if(Object.keys(put).length) await write("settings_set",{board:A.board(),settings:put});
+    if(del.length) await write("settings_del",{board:A.board(),keys:del});
     PENDING_DEFAULT.clear(); toast("Settings saved — the TV will update within a few minutes","ok");
     await A.fetchSheet(); renderSettings(); renderOverview(); renderSheet();
   }catch(err){ if(err.message!=="range") toast(err.message,"bad"); $("setSave").disabled=false; $("setMsg").textContent=""; }
 });
 /* preview */
-let pvLoaded=false;
+var pvLoaded=false;
 function pvFit(){ const w=$("pvWrap"), f=$("pvFrame"); if(!w||!f) return; const land=w.classList.contains("land"); const W=land?1920:1080, H=land?1080:1920; const s=Math.min(w.clientWidth/W, w.clientHeight/H); f.style.width=W+"px"; f.style.height=H+"px"; f.style.transform="scale("+s+")"; f.style.left=((w.clientWidth-W*s)/2)+"px"; f.style.top=((w.clientHeight-H*s)/2)+"px"; }
 window.addEventListener("resize",pvFit); new ResizeObserver(pvFit).observe($("pvWrap"));
-function pvEnsure(){ if(pvLoaded) return; pvLoaded=true; $("pvFrame").src="prayerdisplay.html?preview=1&t="+Date.now(); }
-$("pvReload").onclick=()=>{ $("pvFrame").src="prayerdisplay.html?preview=1&t="+Date.now(); };
+function pvSrc(){ return (A.board()==="iaos"?"iaosdisplay.html":"prayerdisplay.html")+"?preview=1&board="+A.board()+"&t="+Date.now(); }
+function pvEnsure(){ if(pvLoaded) return; pvLoaded=true; $("pvFrame").src=pvSrc(); }
+function pvReset(){ pvLoaded=false; $("pvFrame").removeAttribute("src"); }
+$("pvReload").onclick=()=>{ $("pvFrame").src=pvSrc(); };
 $("pvOrient").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; $("pvOrient").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x===b)); $("pvWrap").classList.toggle("land",b.dataset.o==="l"); pvFit(); $("pvHint").textContent=b.dataset.o==="l"?"landscape":"portrait"; };
 
 /* ---- Boot ---- */
@@ -772,5 +774,5 @@ const s=session(); if(s){ boot(s.email); if(!s.grand) write("whoami").catch(()=>
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3aa286fa858d325',t:'MTc4OTMzNDAyOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3aa575ddf1eda76',t:'MTc4OTMzNTk1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
