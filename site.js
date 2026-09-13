@@ -88,10 +88,18 @@ function applySettings(){
 
 /* ---- 4. Data fetch ---- */
 function fetchSheet(){
-  const B=BOARDS[BOARD]; const ranges=[B.iq+"!A1:Z400",B.ann+"!A1:Z400",B.set+"!A1:Z200"].map(r=>"ranges="+encodeURIComponent(r)).join("&");
-  const url="https://sheets.googleapis.com/v4/spreadsheets/"+SHEET_ID+"/values:batchGet?"+ranges+"&majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE&key="+API_KEY;
-  return fetch(url,{cache:"no-store"}).then(r=>{ if(!r.ok) throw new Error("sheet "+r.status); return r.json(); }).then(j=>{
-    const vr=j.valueRanges||[]; const strip=g=>(g&&g.values||[]).slice(1).filter(r=>r.some(c=>String(c||"").trim()));
+  const B=BOARDS[BOARD]; const names=[B.iq,B.ann,B.set], sizes=["A1:Z400","A1:Z400","A1:Z200"];
+  const base="https://sheets.googleapis.com/v4/spreadsheets/"+SHEET_ID+"/values";
+  const strip=g=>(g&&g.values||[]).slice(1).filter(r=>r.some(c=>String(c||"").trim()));
+  const one=i=>fetch(base+"/"+encodeURIComponent(names[i]+"!"+sizes[i])+"?majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE&key="+API_KEY,{cache:"no-store"})
+    .then(r=>{ if(r.ok) return r.json(); if(r.status===400) return {values:[]}; /* tab not created yet -> empty */ throw new Error("sheet "+r.status); });
+  const ranges=names.map((n,i)=>"ranges="+encodeURIComponent(n+"!"+sizes[i])).join("&");
+  const url=base+":batchGet?"+ranges+"&majorDimension=ROWS&valueRenderOption=FORMATTED_VALUE&key="+API_KEY;
+  return fetch(url,{cache:"no-store"}).then(r=>{
+      if(r.ok) return r.json().then(j=>j.valueRanges||[]);
+      if(r.status===400) return Promise.all([one(0),one(1),one(2)]);   // one or more tabs missing: read each separately
+      throw new Error("sheet "+r.status);
+    }).then(vr=>{
     SHEET={iqamah:strip(vr[0]),announcements:strip(vr[1]),settings:strip(vr[2]),fetchedAt:Date.now(),live:true};
     try{ localStorage.setItem(cacheKey(),JSON.stringify(SHEET)); }catch(e){}
     applySettings(); return SHEET;
