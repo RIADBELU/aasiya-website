@@ -6,7 +6,7 @@
 <title>Admin — Aasiya Musalla</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="site.css?v=202609050548">
-<link rel="stylesheet" href="admin.css?v=202609081320">
+<link rel="stylesheet" href="admin.css?v=202609131500">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -60,7 +60,7 @@
     </nav>
     <div class="side-tv">
       <span class="k">TV display</span>
-      <div class="tvrow"><a href="prayerdisplay.html" target="_blank" rel="noopener">New</a><a href="currentdisplay.html" target="_blank" rel="noopener">Current</a><a href="oldtvdisplay.html" target="_blank" rel="noopener">Old</a></div>
+      <div class="tvrow"><a href="prayerdisplay.html" target="_blank" rel="noopener">New</a><a href="currentdisplay.html" target="_blank" rel="noopener">Current</a><a href="oldtvdisplay.html" target="_blank" rel="noopener">Old</a><a href="iaosdisplay.html" target="_blank" rel="noopener">IAOS</a></div>
     </div>
     <div class="side-foot">
       <button class="theme-row" id="themeBtn" type="button"><span>Dark mode</span><i class="sw"><b></b></i></button>
@@ -82,6 +82,7 @@
       <button class="menu-btn side-toggle" id="sideToggle" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <div class="ttl"><h1 id="viewTitle">Overview</h1><p class="vsub" id="viewSub">Aasiya Musalla · Regina, SK</p></div>
       <div class="hdr-acts">
+        <div class="seg board-seg" id="boardSeg" title="Which board you are editing"><button type="button" data-board="aasiya" class="on">Aasiya Musalla</button><button type="button" data-board="iaos">IAOS Regina</button></div>
         <span class="synced" id="syncedAt"></span>
         <button class="btn btn-ghost btn-sm" id="reloadBtn" type="button">↻ Reload data</button>
         <a class="btn btn-ghost btn-sm" id="sheetLink" target="_blank" rel="noopener">Open Sheet ↗</a>
@@ -494,7 +495,7 @@ async function loadAll(){
   try{ await A.fetchAdhan(n.y,n.m); }catch(e){}
   TODAY=A.timesFor(n); DAY=A.buildDay(n);
   ROWS=(A.SHEET().announcements||[]).map((r,i)=>({message:r[0]||"",start:r[1]||"",end:r[2]||"",i}));
-  SCHED=(A.SHEET().iqamah||[]).map((r,i)=>({row:i+2,date:String(r[0]||""),key:A.parseDateKey(r[0]),vals:[1,2,3,4,5].map(k=>String(r[k]==null?"":r[k]))}));
+  SCHED=(A.SHEET().iqamah||[]).map((r,i)=>({row:i+2,date:String(r[0]||""),key:A.parseDateKey(r[0]),vals:[1,2,3,4,5,6,7].map(k=>String(r[k]==null?"":r[k]))}));
   // the schedule in effect = same rule as the display
   const tk=n.y*10000+n.m*100+n.d; let best=-1,bk=-1;
   SCHED.forEach((s,i)=>{ if(s.key!==null&&s.key<=tk&&s.key>=bk){bk=s.key;best=i;} });
@@ -504,6 +505,10 @@ async function loadAll(){
   $("syncedAt").textContent="Synced "+new Date().toLocaleTimeString("en-CA",{timeZone:"America/Regina",hour:"numeric",minute:"2-digit"});
   renderOverview(); renderIqamah(); renderAnn(); renderSettings(); renderSheet(); paintConn();
 }
+/* ---- Board switch (Aasiya Musalla / IAOS Regina) ---- */
+function paintBoard(){ document.querySelectorAll("#boardSeg button").forEach(b=>b.classList.toggle("on",b.dataset.board===A.board())); document.body.dataset.board=A.board(); $("viewSub").textContent=(A.board()==="iaos"?"IAOS Regina board":"Aasiya Musalla")+" · Regina, SK"; document.querySelectorAll(".tvlink").forEach(a=>a.href=A.board()==="iaos"?"iaosdisplay.html":"prayerdisplay.html"); }
+document.querySelectorAll("#boardSeg button").forEach(b=>b.onclick=async()=>{ if(b.dataset.board===A.board()) return; if((DIRTY||SET_DIRTY)&&!confirm("You have unsaved changes. Switch board anyway?")) return; DIRTY=false; SET_DIRTY=false; EDIT=null; CUR_SCHED=0; A.setBoard(b.dataset.board); try{ localStorage.setItem("aasiya.admin.board",A.board()); }catch(e){} paintBoard(); await loadAll(); toast("Now editing the "+(A.board()==="iaos"?"IAOS Regina":"Aasiya Musalla")+" board"); });
+try{ const bb=localStorage.getItem("aasiya.admin.board"); if(bb) A.setBoard(bb); }catch(e){} paintBoard();
 $("reloadBtn").onclick=()=>{ if((DIRTY||SET_DIRTY)&&!confirm("You have unsaved changes. Reload anyway?")) return; DIRTY=false; SET_DIRTY=false; loadAll().then(()=>toast("Data reloaded")); };
 
 /* ---- Overview ---- */
@@ -555,7 +560,7 @@ function renderIqamah(){
       '<span class="begin">'+(begin!=null?A.fmtTime(begin):"—")+'</span>'+
       '<span><input class="iqin" data-i="'+i+'" value="'+esc(s?s.vals[i]:"")+'" placeholder="'+(p.key==="maghrib"?"+5":"e.g. 5:15")+'" autocomplete="off" spellcheck="false"></span>'+
       '<span class="res" data-res="'+i+'">—</span></div>';
-  }).join("");
+  }).join("")+(A.board()==="iaos"?[["Jummah 1","الجمعة ١",5],["Jummah 2","الجمعة ٢",6]].map(([lb,ar,i])=>'<div class="iqrow jum"><span class="pn"><b>'+lb+'</b><small>'+ar+'</small></span><span class="begin">Friday</span><span><input class="iqin" data-i="'+i+'" value="'+esc(s?s.vals[i]:"")+'" placeholder="e.g. 1:15 pm" autocomplete="off" spellcheck="false"></span><span class="res" data-res="'+i+'">—</span></div>').join(""):"");
   $("iqRows").querySelectorAll(".iqin").forEach(inp=>{ inp.addEventListener("input",()=>{ DIRTY=true; $("iqSave").disabled=false; $("iqMsg").textContent=""; previewRow(+inp.dataset.i); }); previewRow(+inp.dataset.i); });
   $("iqSave").disabled=!DIRTY;
   // list
@@ -567,6 +572,8 @@ function renderIqamah(){
   const nd=$("newDate"); if(!nd.value) nd.min=todayKey();
 }
 function previewRow(i){
+  if(i>=5){ const inp=$("iqRows").querySelector('.iqin[data-i="'+i+'"]'), res=$("iqRows").querySelector('[data-res="'+i+'"]'); const v=inp.value.trim(); const r=v?A.resolveIqamah(v,12,"—"):{hours:null,text:""};
+    res.className="res "+(v?(r.hours==null?"warn":""):"dim"); res.innerHTML=!v?"— <small>card hidden</small>":(r.hours==null?esc(r.text)+" <small>shown as text</small>":A.fmtTime(r.hours)); return; }
   const p=A.PRAYERS[i], inp=$("iqRows").querySelector('.iqin[data-i="'+i+'"]'), res=$("iqRows").querySelector('[data-res="'+i+'"]');
   const begin=TODAY?TODAY[p.key]:null; const v=inp.value.trim();
   const dflt=p.key==="maghrib"?"+"+Math.round(A.CFG.maghribIqamahMinutes):"+10";
@@ -581,21 +588,21 @@ $("iqReset").onclick=()=>{ DIRTY=false; renderIqamah(); $("iqMsg").textContent="
 $("iqForm").addEventListener("submit",async e=>{
   e.preventDefault(); const s=SCHED[CUR_SCHED]; if(!s){ toast("No schedule row to edit","bad"); return; }
   const vals=[...$("iqRows").querySelectorAll(".iqin")].map(i=>i.value.trim());
-  const payload={row:s.row,originalDate:s.date,date:s.date}; A.PRAYERS.forEach((p,i)=>payload[p.key]=vals[i]);
+  const payload={board:A.board(),row:s.row,originalDate:s.date,date:s.date}; A.PRAYERS.forEach((p,i)=>payload[p.key]=vals[i]); if(vals.length>5){ payload.jummah1=vals[5]; payload.jummah2=vals[6]; }
   $("iqSave").disabled=true; $("iqMsg").textContent="Saving…"; $("iqMsg").className="msg";
   try{ await write("iqamah_set",payload); DIRTY=false; $("iqMsg").textContent=""; toast("Iqamah times saved — live on the website and TV within 5 minutes","ok"); await loadAll(); }
   catch(err){ $("iqMsg").textContent=err.message; $("iqMsg").className="msg bad"; $("iqSave").disabled=false; }
 });
 $("iqNewForm").addEventListener("submit",async e=>{
   e.preventDefault(); const d=$("newDate").value; if(!d) return; const src=SCHED[CUR_SCHED]||{vals:["","","","",""]};
-  const payload={date:d}; A.PRAYERS.forEach((p,i)=>payload[p.key]=src.vals[i]);
+  const payload={board:A.board(),date:d}; A.PRAYERS.forEach((p,i)=>payload[p.key]=src.vals[i]); if(A.board()==="iaos"){ payload.jummah1=src.vals[5]||""; payload.jummah2=src.vals[6]||""; }
   $("newMsg").textContent="Adding…"; $("newMsg").className="msg";
   try{ const j=await write("iqamah_add",payload); $("newMsg").textContent=""; toast(j.merged?"That date already existed — it was updated":"Scheduled row added","ok"); DIRTY=false; await loadAll(); const idx=SCHED.findIndex(x=>x.row===j.row); if(idx>=0){ CUR_SCHED=idx; renderIqamah(); } $("newDate").value=""; }
   catch(err){ $("newMsg").textContent=err.message; $("newMsg").className="msg bad"; }
 });
 async function delSched(i){
   const s=SCHED[i]; if(!s||!confirm("Delete the schedule row dated "+(s.date||"Undated")+"?\n\nThis cannot be undone.")) return;
-  try{ await write("iqamah_del",{row:s.row,date:s.date}); toast("Schedule row deleted","ok"); DIRTY=false; CUR_SCHED=0; await loadAll(); }catch(err){ toast(err.message,"bad"); }
+  try{ await write("iqamah_del",{board:A.board(),row:s.row,date:s.date}); toast("Schedule row deleted","ok"); DIRTY=false; CUR_SCHED=0; await loadAll(); }catch(err){ toast(err.message,"bad"); }
 }
 
 /* ---- Announcements ---- */
@@ -625,15 +632,15 @@ $("annForm").addEventListener("submit",async e=>{
   if(start&&end&&end<start){ out.className="msg bad"; out.textContent="“Until” must be after “From”."; return; }
   $("annSave").disabled=true; out.textContent=EDIT!==null?"Saving…":"Publishing…";
   try{
-    if(EDIT!==null){ const r=ROWS.find(x=>x.i===EDIT); await write("update",{row:r.i+2,original:r.message,message,start,end}); toast("Announcement updated","ok"); cancelEdit(); }
-    else{ await write("add",{message,start,end}); toast("Published — it will appear on the website and TV within 5 minutes","ok"); $("annForm").reset(); updPreview(); }
+    if(EDIT!==null){ const r=ROWS.find(x=>x.i===EDIT); await write("update",{board:A.board(),row:r.i+2,original:r.message,message,start,end}); toast("Announcement updated","ok"); cancelEdit(); }
+    else{ await write("add",{board:A.board(),message,start,end}); toast("Published — it will appear on the website and TV within 5 minutes","ok"); $("annForm").reset(); updPreview(); }
     out.textContent=""; await loadAll();
   }catch(err){ out.className="msg bad"; out.textContent=err.message; }
   $("annSave").disabled=false;
 });
 async function removeAnn(i){
   const r=ROWS.find(x=>x.i===i); if(!r||!confirm("Remove this announcement?\n\n"+r.message)) return;
-  try{ await write("delete",{row:i+2,message:r.message}); toast("Announcement removed","ok"); if(EDIT===i) cancelEdit(); await loadAll(); }
+  try{ await write("delete",{board:A.board(),row:i+2,message:r.message}); toast("Announcement removed","ok"); if(EDIT===i) cancelEdit(); await loadAll(); }
   catch(err){ toast(err.message,"bad"); }
 }
 
@@ -765,5 +772,5 @@ const s=session(); if(s){ boot(s.email); if(!s.grand) write("whoami").catch(()=>
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a383b436ba5f1c74',t:'MTc4ODkzMDgwOQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3aa286fa858d325',t:'MTc4OTMzNDAyOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
