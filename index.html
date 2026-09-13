@@ -6,7 +6,7 @@
 <title>Aasiya Musalla — Regina, Saskatchewan</title>
 <meta name="description" content="Aasiya Musalla prayer times, iqamah schedule and community announcements — Regina, Saskatchewan.">
 <link rel="canonical" href="https://aasiyaregina.xubi.org/">
-<link rel="stylesheet" href="site.css?v=202609081205">
+<link rel="stylesheet" href="site.css?v=202609131500">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -235,12 +235,21 @@
   </div>
   <div class="modal-box modal-choose" id="tvChoose" hidden>
     <h3>Choose a display</h3>
-    <p class="hint">All three show the same live times and announcements — pick the look you prefer.</p>
-    <div class="choose-grid">
-      <a class="choice" href="oldtvdisplay.html"><img src="assets/preview-old.png" alt="Old display preview"><span>Old Display</span></a>
-      <a class="choice" href="currentdisplay.html"><img src="assets/preview-current.png" alt="Current display preview"><span>Current Display</span></a>
-      <a class="choice" href="prayerdisplay.html"><img src="assets/preview-new.png" alt="New display preview"><span>New Display</span></a>
-    </div>
+    <p class="hint">All displays run live from the Google Sheet — pick the look you prefer.</p>
+    <details class="dd" open>
+      <summary><b>Original</b><span>Aasiya Musalla boards</span><i></i></summary>
+      <div class="choose-grid">
+        <a class="choice" href="oldtvdisplay.html"><img src="assets/preview-old.png" alt="Old display preview"><span>Old Display</span></a>
+        <a class="choice" href="currentdisplay.html"><img src="assets/preview-current.png" alt="Current display preview"><span>Current Display</span></a>
+        <a class="choice" href="prayerdisplay.html"><img src="assets/preview-new.png" alt="New display preview"><span>New Display</span></a>
+      </div>
+    </details>
+    <details class="dd">
+      <summary><b>Inspired</b><span>Replicas of other Regina boards</span><i></i></summary>
+      <div class="choose-grid">
+        <a class="choice" href="iaosdisplay.html"><img src="assets/preview-iaos.png" alt="IAOS Regina display preview"><span><img class="ci" src="assets/iaos-logo-white.png" alt="">IAOS Regina</span></a>
+      </div>
+    </details>
     <div class="modal-acts"><button class="btn btn-ghost" type="button" id="tvBack">Back</button></div>
   </div>
 </div>
@@ -541,5 +550,5 @@ setInterval(tick,1000); setInterval(sync,5*60*1000);
   new MutationObserver(()=>{ document.querySelectorAll('.ptable .p:not(.rv), .ann:not(.rv)').forEach(el=>{ el.classList.add('rv','in'); }); }).observe(document.body,{subtree:true,childList:true});
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a383bfb30c26a14f',t:'MTc4ODkzMTI3OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3aa0c1eb89895a2',t:'MTc4OTMzMjg2OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
