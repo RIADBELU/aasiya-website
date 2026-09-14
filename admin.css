@@ -625,3 +625,19 @@ html[data-theme="dark"] .btn-wa{color:#4be38a}
 body[data-board="iaos"] .board-seg button.on{background:var(--green-2);color:#fff}
 .iqrow.jum .begin{color:var(--muted);font-weight:600}
 @media (max-width:640px){.board-seg{order:-1;width:100%;justify-content:center}}
+
+/* ---- IAOS picture slides v9 ---- */
+.ann-cols #slidesPanel{grid-column:1/-1}
+.slform{display:flex;gap:10px;margin:12px 0}
+.slform input{flex:1;min-width:0}
+.sl-list{display:flex;flex-direction:column;gap:8px}
+.slrow{display:grid;grid-template-columns:96px 1fr auto;gap:12px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px}
+.slrow img{width:96px;height:62px;object-fit:cover;border-radius:8px;background:#0b3d36}
+.slrow img.bad{opacity:.25}
+.slrow .u{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink-2)}
+.slrow .acts{display:flex;gap:4px}
+.slrow .x{color:#b42318}
+.slopts{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.slopts .slopt{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;margin:0;text-transform:none}
+.slopts .slopt input[type=number]{width:80px}
+.slopts .msg{flex:1;text-align:right}
