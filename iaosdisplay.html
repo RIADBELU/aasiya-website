@@ -73,7 +73,7 @@ body{font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased
 
 /* ================= LANDSCAPE (photo 3) ================= */
 @media (orientation:landscape){
-  .frame{display:grid;grid-template-columns:minmax(0,1fr) 30vw;grid-template-rows:1fr auto auto;grid-template-areas:"left side" "strip side" "tick tick";background:#fff}
+  .frame{--strip:8.6vh;--tick:4.6vh;display:grid;grid-template-columns:minmax(0,1fr) 30vw;grid-template-rows:1fr var(--strip) var(--tick);grid-template-areas:"left side" "strip side" "tick tick";background:#fff}
   .head,.nextbar,.table,.cards{display:none}
   .lpanel{display:flex;grid-area:left;min-width:0;background:#0b3d36;position:relative;overflow:hidden}
   .side{grid-area:side;min-width:0;min-height:0;background:var(--green);color:#fff;display:flex;flex-direction:column;padding:1.4vmin 1.6vmin;gap:1vmin;overflow:hidden}
@@ -98,7 +98,7 @@ body{font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased
   .jum2 .sbox .v{font-size:2.3vmin}
   .side .v i{font-style:normal;font-size:.55em;font-weight:700;margin-left:.4em}
 
-  .strip{display:grid;grid-area:strip;min-width:0;grid-template-columns:repeat(5,minmax(0,1fr));background:#fff;border-top:.15vmin solid var(--line)}
+  .strip{display:grid;grid-area:strip;min-width:0;height:var(--strip);align-content:center;grid-template-columns:repeat(5,minmax(0,1fr));background:#fff;border-top:.15vmin solid var(--line)}
   .strip .p{padding:1.4vmin .6vmin 1.2vmin;text-align:center;min-width:0;overflow:hidden;border-right:.12vmin solid var(--line)}
   .strip .p:last-child{border-right:0}
   .strip .p.cur{background:#eeeeee}
@@ -106,14 +106,16 @@ body{font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased
   .strip .p .n.ar{font-family:"Noto Naskh Arabic","Amiri","Scheherazade New","Traditional Arabic",serif;direction:rtl}
   .strip .p .bi{margin-top:.6vmin;font-size:1.45vmin;color:var(--mute);font-weight:500;display:flex;justify-content:center;gap:1.2vmin;white-space:nowrap}
   .strip .p .bi b{color:var(--ink);font-weight:600;font-size:1.75vmin;margin-left:.4vmin}
-  .ticker{grid-area:tick;height:4.6vmin}
+  .ticker{grid-area:tick;height:var(--tick)}
   .ticker .tlogo{width:4.6vmin;height:4.6vmin}
   .ticker .track{font-size:1.85vmin}
 
   /* left panel: rotating announcement cards */
   .lpanel .strk{position:absolute;inset:0;display:flex;transition:transform .9s cubic-bezier(.65,0,.35,1);will-change:transform}
   .lpanel .strk.snap{transition:none}
-  .lpanel .strk img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block;background:#0b3d36}
+  .lpanel .strk .sl{flex:0 0 100%;width:100%;height:100%;position:relative;overflow:hidden;background:#0b3d36}
+  .lpanel .strk .sl .bg{position:absolute;inset:-6%;width:112%;height:112%;object-fit:cover;filter:blur(3vmin) brightness(.55);transform:scale(1.05)}
+  .lpanel .strk .sl .im{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
   .lpanel .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
   .lpanel .empty img{width:22vmin;height:22vmin;object-fit:contain;opacity:.22}
   .lpanel.has .empty,.lpanel.has .brand{display:none}
@@ -254,7 +256,7 @@ function paintSlides(){
     lp.dataset.key=key; slideI=0; clearInterval(slideT);
     // clone first image at the end so the last -> first move slides forward too
     tr.classList.add("snap"); tr.style.transform="translateX(0)";
-    tr.innerHTML=SL.urls.map(u=>'<img src="'+esc(u)+'" alt="">').join("")+(n>1?'<img src="'+esc(SL.urls[0])+'" alt="">':"");
+    const one=u=>'<div class="sl"><img class="bg" src="'+esc(u)+'" alt=""><img class="im" src="'+esc(u)+'" alt=""></div>'; tr.innerHTML=SL.urls.map(one).join("")+(n>1?one(SL.urls[0]):"");
     $("dots").innerHTML=n>1?SL.urls.map((_,i)=>'<i class="'+(i===0?"on":"")+'"></i>').join(""):"";
     requestAnimationFrame(()=>tr.classList.remove("snap"));
     if(n>1) slideT=setInterval(nextSlide,Math.max(3,SL.seconds||8)*1000);
@@ -340,5 +342,5 @@ if(document.referrer&&new URL(document.referrer).origin===location.origin) back.
 /* F = toggle fullscreen */
 addEventListener("keydown",e=>{ if((e.key==="f"||e.key==="F")&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>{}); } });
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ab672f8d235d34',t:'MTc4OTM0NzA4NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3abaf884f425e5d',t:'MTc4OTM1MDA0OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
