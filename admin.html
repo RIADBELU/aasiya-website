@@ -6,7 +6,7 @@
 <title>Admin — Aasiya Musalla</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="site.css?v=202609050548">
-<link rel="stylesheet" href="admin.css?v=202609131500">
+<link rel="stylesheet" href="admin.css?v=202609131900">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
@@ -231,9 +231,23 @@
           </div>
           <div id="list" class="ann-list"></div>
         </div>
+        <div class="panel iaos-only" id="slidesPanel" hidden>
+          <div class="panel-h"><h2>Picture slides <span class="pill" id="slCount">0</span></h2><span class="hint">Landscape TV · left panel · <b>1344 × 864 px</b></span></div>
+          <p class="sub">Pictures for the empty area of the IAOS landscape screen. Paste a link to an image (JPG/PNG/WebP, ideally 1344 × 864 px, other sizes are centre-cropped). Kept in the display service — not in the Google Sheet.</p>
+          <form id="slForm" class="slform">
+            <input id="slUrl" type="url" placeholder="https://…/poster.jpg" required>
+            <button class="btn btn-gold btn-sm" type="submit">Add</button>
+          </form>
+          <div id="slList" class="sl-list"></div>
+          <div class="slopts">
+            <label class="slopt"><span>Seconds per picture</span><input id="slSec" type="number" min="3" max="120" step="1" value="8"></label>
+            <label class="slopt tog-line"><span>Show dots &amp; counter</span><label class="tog"><input type="checkbox" id="slDots" checked><i></i></label></label>
+            <span class="msg" id="slMsg"></span>
+            <button class="btn btn-gold btn-sm" type="button" id="slSave" disabled>Save slides</button>
+          </div>
+        </div>
       </div>
     </section>
-
 
     <!-- ---------- DISPLAY SETTINGS ---------- -->
     <section class="view" data-view="display" hidden>
@@ -503,7 +517,7 @@ async function loadAll(){
   if(!DIRTY) CUR_SCHED=Math.max(0,best);
   SCHED.forEach((s,i)=>s.inEffect=i===best);
   $("syncedAt").textContent="Synced "+new Date().toLocaleTimeString("en-CA",{timeZone:"America/Regina",hour:"numeric",minute:"2-digit"});
-  renderOverview(); renderIqamah(); renderAnn(); renderSettings(); renderSheet(); paintConn();
+  renderOverview(); renderIqamah(); renderAnn(); renderSettings(); renderSheet(); paintConn(); if(typeof slLoad==="function") slLoad();
 }
 /* ---- Board switch (Aasiya Musalla / IAOS Regina) ---- */
 function paintBoard(){ document.querySelectorAll("#boardSeg button").forEach(b=>b.classList.toggle("on",b.dataset.board===A.board())); document.body.dataset.board=A.board(); document.querySelectorAll("[data-settab]").forEach(e=>e.textContent=A.BOARDS[A.board()].set); if($("pvFrame").getAttribute("src")){ pvReset(); if(location.hash==="#display") pvEnsure(); } $("viewSub").textContent=(A.board()==="iaos"?"IAOS Regina board":"Aasiya Musalla")+" · Regina, SK"; document.querySelectorAll(".tvlink").forEach(a=>a.href=A.board()==="iaos"?"iaosdisplay.html":"prayerdisplay.html"); }
@@ -743,6 +757,23 @@ $("setForm").addEventListener("submit",async e=>{
     await A.fetchSheet(); renderSettings(); renderOverview(); renderSheet();
   }catch(err){ if(err.message!=="range") toast(err.message,"bad"); $("setSave").disabled=false; $("setMsg").textContent=""; }
 });
+
+/* ---- IAOS picture slides (Apps Script property, not the Sheet) ---- */
+let SL={urls:[],seconds:8,dots:true}, SL_DIRTY=false;
+function slPaint(){
+  const on=A.board()==="iaos"; $("slidesPanel").hidden=!on; if(!on) return;
+  $("slCount").textContent=SL.urls.length;
+  $("slList").innerHTML=SL.urls.length?SL.urls.map((u,i)=>'<div class="slrow"><img src="'+u.replace(/"/g,"&quot;")+'" alt="" loading="lazy" onerror="this.classList.add(\'bad\')"><span class="u" title="'+u.replace(/"/g,"&quot;")+'">'+(i+1)+'. '+u.replace(/</g,"&lt;")+'</span><span class="acts"><button type="button" class="btn btn-ghost btn-sm" data-mv="-1" data-i="'+i+'" title="Move up" '+(i===0?"disabled":"")+'>↑</button><button type="button" class="btn btn-ghost btn-sm" data-mv="1" data-i="'+i+'" title="Move down" '+(i===SL.urls.length-1?"disabled":"")+'>↓</button><button type="button" class="btn btn-ghost btn-sm x" data-x="'+i+'" title="Remove">✕</button></span></div>').join(""):'<p class="sub">No pictures yet — the TV shows the IAOS logo on green until you add one.</p>';
+  $("slSec").value=SL.seconds; $("slDots").checked=SL.dots!==false; $("slSave").disabled=!SL_DIRTY;
+}
+function slMark(){ SL_DIRTY=true; slPaint(); }
+async function slLoad(){ if(A.board()!=="iaos") { slPaint(); return; } try{ const j=await write("slides_get",{}); SL={urls:j.urls||[],seconds:+j.seconds||8,dots:j.dots!==false}; }catch(e){ $("slMsg").textContent=e.message; } SL_DIRTY=false; slPaint(); }
+$("slForm").onsubmit=e=>{ e.preventDefault(); const u=$("slUrl").value.trim(); if(!/^https?:\/\//i.test(u)) return; if(SL.urls.length>=30){ toast("Maximum 30 pictures","bad"); return; } SL.urls.push(u); $("slUrl").value=""; slMark(); };
+$("slList").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; if(b.dataset.x!=null){ SL.urls.splice(+b.dataset.x,1); slMark(); } else if(b.dataset.mv){ const i=+b.dataset.i, j=i+ +b.dataset.mv; if(j<0||j>=SL.urls.length) return; [SL.urls[i],SL.urls[j]]=[SL.urls[j],SL.urls[i]]; slMark(); } };
+$("slSec").oninput=()=>{ SL.seconds=Math.min(120,Math.max(3,+$("slSec").value||8)); SL_DIRTY=true; $("slSave").disabled=false; };
+$("slDots").onchange=()=>{ SL.dots=$("slDots").checked; SL_DIRTY=true; $("slSave").disabled=false; };
+$("slSave").onclick=async()=>{ $("slSave").disabled=true; $("slMsg").textContent="Saving…"; try{ const j=await write("slides_set",{urls:SL.urls,seconds:SL.seconds,dots:SL.dots}); SL={urls:j.urls||[],seconds:+j.seconds||8,dots:j.dots!==false}; SL_DIRTY=false; $("slMsg").textContent=""; toast("Slides saved — the TV updates within 5 minutes","ok"); slPaint(); }catch(e){ $("slMsg").textContent=e.message; $("slSave").disabled=false; } };
+
 /* preview */
 var pvLoaded=false;
 function pvFit(){ const w=$("pvWrap"), f=$("pvFrame"); if(!w||!f) return; const land=w.classList.contains("land"); const W=land?1920:1080, H=land?1080:1920; const s=Math.min(w.clientWidth/W, w.clientHeight/H); f.style.width=W+"px"; f.style.height=H+"px"; f.style.transform="scale("+s+")"; f.style.left=((w.clientWidth-W*s)/2)+"px"; f.style.top=((w.clientHeight-H*s)/2)+"px"; }
@@ -774,5 +805,5 @@ const s=session(); if(s){ boot(s.email); if(!s.grand) write("whoami").catch(()=>
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3aa575ddf1eda76',t:'MTc4OTMzNTk1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ab67eed82b5d34',t:'MTc4OTM0NzExNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
