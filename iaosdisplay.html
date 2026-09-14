@@ -111,19 +111,21 @@ body{font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased
   .ticker .track{font-size:1.85vmin}
 
   /* left panel: rotating announcement cards */
-  .lpanel .slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:6vmin 7vmin;opacity:0;transition:opacity .8s}
-  .lpanel .slide.on{opacity:1}
-  .lpanel .slide .box{background:#fff;color:var(--ink);border-radius:2.4vmin;padding:5vmin 6vmin;max-width:100%;box-shadow:0 2vmin 6vmin rgba(0,0,0,.35);text-align:center}
-  .lpanel .slide .box .tag{display:inline-block;background:var(--green);color:#fff;border-radius:99vmin;padding:.7vmin 2vmin;font-size:1.6vmin;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-  .lpanel .slide .box .msg{margin-top:2.6vmin;font-size:4.2vmin;font-weight:600;line-height:1.3;letter-spacing:-.01em}
-  .lpanel .slide .box .msg.long{font-size:3.2vmin}
-  .lpanel .slide .box .msg.xlong{font-size:2.5vmin}
+  .lpanel .strk{position:absolute;inset:0;display:flex;transition:transform .9s cubic-bezier(.65,0,.35,1);will-change:transform}
+  .lpanel .strk.snap{transition:none}
+  .lpanel .strk img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block;background:#0b3d36}
+  .lpanel .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .lpanel .empty img{width:22vmin;height:22vmin;object-fit:contain;opacity:.22}
+  .lpanel.has .empty,.lpanel.has .brand{display:none}
+  .lpanel .bar{position:absolute;left:0;right:0;bottom:0;height:7.5vmin;display:flex;align-items:center;justify-content:center;gap:1.3vmin;padding:0 3vmin;background:linear-gradient(to top,rgba(0,0,0,.62),rgba(0,0,0,0));pointer-events:none;opacity:0;transition:opacity .4s}
+  .lpanel.has.dots .bar{opacity:1}
+  .lpanel .bar .num{position:absolute;right:3vmin;bottom:2.1vmin;color:#fff;font-size:1.9vmin;font-weight:600;letter-spacing:.04em;text-shadow:0 .2vmin .8vmin rgba(0,0,0,.6);font-variant-numeric:tabular-nums}
   .lpanel .brand{position:absolute;left:3vmin;bottom:2.4vmin;display:flex;align-items:center;gap:1.2vmin;color:#fff;opacity:.85}
   .lpanel .brand img{width:4.6vmin;height:4.6vmin;object-fit:contain}
   .lpanel .brand span{font-size:1.7vmin;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
-  .lpanel .dots{position:absolute;right:3vmin;bottom:3vmin;display:flex;gap:.8vmin}
-  .lpanel .dots i{width:1.1vmin;height:1.1vmin;border-radius:50%;background:rgba(255,255,255,.35)}
-  .lpanel .dots i.on{background:#e6c979}
+  .lpanel .dots{display:flex;gap:1.6vmin;align-items:center;margin-bottom:1.6vmin}
+  .lpanel .dots i{width:1.4vmin;height:1.4vmin;border-radius:99vmin;background:rgba(255,255,255,.72);transition:width .45s cubic-bezier(.65,0,.35,1),background .3s;box-shadow:0 .1vmin .5vmin rgba(0,0,0,.35)}
+  .lpanel .dots i.on{width:7vmin;background:#fff}
 }
 
 /* ---------- status box (Adhan / Iqamah time) ---------- */
@@ -170,8 +172,10 @@ body{font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased
 
   <!-- ===== landscape ===== -->
   <section class="lpanel" id="lpanel">
+    <div class="empty"><img src="assets/iaos-logo-white.png" alt=""></div>
+    <div class="strk" id="strack"></div>
     <div class="brand"><img src="assets/iaos-logo-white.png" alt=""><span>IAOS Regina</span></div>
-    <div class="dots" id="dots"></div>
+    <div class="bar"><div class="dots" id="dots"></div><div class="num" id="slideNum"></div></div>
   </section>
   <aside class="side">
     <div class="org">Islamic Association of Saskatchewan — Regina</div>
@@ -237,17 +241,45 @@ function renderTicker(){
   if(!list.length) list.push("Welcome to IAOS Regina — Islamic Association of Saskatchewan (Regina) Inc.");
   const html=list.map(t=>esc(t)+"<i>•</i>").join("");
   const tr=$("track"); if(tr.dataset.html!==html){ tr.innerHTML=html; tr.dataset.html=html; const chars=list.join(" ").length; tr.style.setProperty("--tk",Math.max(20,Math.round(chars/6+18))+"s"); }
-  renderSlides(list);
 }
-/* landscape left panel: announcement cards */
-let SLIDES=[], slideI=0, slideT=null;
-function renderSlides(list){
-  const key=list.join("\u0001"); const lp=$("lpanel"); if(lp.dataset.key===key) return; lp.dataset.key=key;
-  lp.querySelectorAll(".slide").forEach(e=>e.remove()); SLIDES=list;
-  list.forEach((t,i)=>{ const d=document.createElement("div"); d.className="slide"+(i===0?" on":""); const L=t.length; d.innerHTML='<div class="box"><span class="tag">Announcement</span><div class="msg'+(L>160?" xlong":L>90?" long":"")+'">'+esc(t)+'</div></div>'; lp.insertBefore(d,lp.firstChild); });
-  $("dots").innerHTML=list.length>1?list.map((_,i)=>'<i class="'+(i===0?"on":"")+'"></i>').join(""):"";
-  slideI=0; clearInterval(slideT); if(list.length>1) slideT=setInterval(()=>{ slideI=(slideI+1)%list.length; lp.querySelectorAll(".slide").forEach((e,k)=>e.classList.toggle("on",list.length-1-k===slideI)); $("dots").querySelectorAll("i").forEach((e,k)=>e.classList.toggle("on",k===slideI)); },Math.max(5,A.CFG.tickerSeconds||12)*1000);
+/* landscape left panel: picture slides (URL list kept in the Apps Script, not the Sheet) */
+const SLIDES_URL="https://script.google.com/macros/s/AKfycbx3pdGH5ibD_LjZMaxCjQxDH5fQMkTqsLqMixiL6Vpem5-p6BJaQQqsDMHV1Eg-TVmF/exec?slides=1";
+const SLIDES_KEY="iaos.slides.v1";
+let SL={urls:[],seconds:8,dots:true}, slideI=0, slideT=null;
+function paintSlides(){
+  const lp=$("lpanel"), tr=$("strack"), n=SL.urls.length;
+  lp.classList.toggle("has",n>0); lp.classList.toggle("dots",SL.dots!==false);
+  const key=SL.urls.join("\u0001")+"|"+SL.seconds;
+  if(lp.dataset.key!==key){
+    lp.dataset.key=key; slideI=0; clearInterval(slideT);
+    // clone first image at the end so the last -> first move slides forward too
+    tr.classList.add("snap"); tr.style.transform="translateX(0)";
+    tr.innerHTML=SL.urls.map(u=>'<img src="'+esc(u)+'" alt="">').join("")+(n>1?'<img src="'+esc(SL.urls[0])+'" alt="">':"");
+    $("dots").innerHTML=n>1?SL.urls.map((_,i)=>'<i class="'+(i===0?"on":"")+'"></i>').join(""):"";
+    requestAnimationFrame(()=>tr.classList.remove("snap"));
+    if(n>1) slideT=setInterval(nextSlide,Math.max(3,SL.seconds||8)*1000);
+  }
+  $("slideNum").textContent=n>1?((slideI%n)+1)+" / "+n:"";
 }
+function nextSlide(){
+  const tr=$("strack"), n=SL.urls.length; if(n<2) return;
+  slideI++;
+  tr.style.transform="translateX(-"+(slideI*100)+"%)";
+  const vis=slideI%n;
+  $("dots").querySelectorAll("i").forEach((e,k)=>e.classList.toggle("on",k===vis));
+  $("slideNum").textContent=(vis+1)+" / "+n;
+  if(slideI===n){ // we are on the clone of #1: snap back silently after the transition
+    setTimeout(()=>{ tr.classList.add("snap"); tr.style.transform="translateX(0)"; slideI=0; requestAnimationFrame(()=>requestAnimationFrame(()=>tr.classList.remove("snap"))); },950);
+  }
+}
+function loadSlides(){
+  fetch(SLIDES_URL,{cache:"no-store",redirect:"follow"}).then(r=>r.json()).then(j=>{
+    if(!j||!j.ok) return; SL={urls:j.urls||[],seconds:+j.seconds||8,dots:j.dots!==false};
+    try{ localStorage.setItem(SLIDES_KEY,JSON.stringify(SL)); }catch(e){} paintSlides();
+  }).catch(()=>{});
+}
+try{ const c=JSON.parse(localStorage.getItem(SLIDES_KEY)||"null"); if(c&&c.urls) SL=c; }catch(e){}
+paintSlides(); loadSlides(); setInterval(loadSlides,5*60*1000);
 
 /* verse of the day (alquran.cloud, cached per day) */
 function verse(n){
@@ -308,5 +340,5 @@ if(document.referrer&&new URL(document.referrer).origin===location.origin) back.
 /* F = toggle fullscreen */
 addEventListener("keydown",e=>{ if((e.key==="f"||e.key==="F")&&!e.ctrlKey&&!e.metaKey&&!e.altKey){ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(()=>{}); } });
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3aa33c6ecd158a4',t:'MTc4OTMzNDQ5Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ab672f8d235d34',t:'MTc4OTM0NzA4NA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
