@@ -6,19 +6,33 @@
 <title>Admin — Aasiya Musalla</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="site.css?v=202609050548">
-<link rel="stylesheet" href="admin.css?v=202609131900">
-<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="admin.css?v=202609221300">
+<link rel="icon" type="image/png" href="assets/favicon.png" id="favPng">
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <script src="https://www.google.com/recaptcha/api.js?onload=captchaReady&render=explicit" async defer></script>
 </head>
 <body class="adm">
 
+<!-- ================= MOSQUE CHOOSER ================= -->
+<div class="chooser" id="chooser" hidden>
+  <div class="chooser-card">
+    <h1>Which Mosque’s Admin Dashboard?</h1>
+    <p>Pick the dashboard you want to sign in to. Each mosque has its own admins.</p>
+    <div class="chooser-grid">
+      <a class="ch ch-aasiya" href="admin.html?mosque=aasiya" data-realm="aasiya"><img src="assets/mark.png" alt=""><b>Aasiya Musalla</b><small>2 Sheppard Street · Regina</small></a>
+      <a class="ch ch-iaos" href="admin.html?mosque=iaos" data-realm="iaos"><img src="assets/iaos-logo-white.png" alt=""><b>IAOS Regina</b><small>Islamic Association of Saskatchewan</small></a>
+      <a class="ch ch-grand" href="admin.html?mosque=grand" data-realm="grand"><img src="assets/grand.png" alt=""><b>Grand Admin</b><small>All mosques · full access</small></a>
+    </div>
+    <a class="back" href="index.html">← Back to website</a>
+  </div>
+</div>
+
 <!-- ================= LOGIN ================= -->
-<div class="login-screen" id="loginScreen">
+<div class="login-screen" id="loginScreen" hidden>
   <div class="login-art"></div>
   <div class="login-panel">
-    <a class="brand" href="index.html"><img src="assets/mark.png" alt="" width="44" height="34"><span>Aasiya Musalla<small>Admin console</small></span></a>
+    <a class="brand" href="admin.html" id="loginBrand"><img src="assets/mark.png" alt="" width="44" height="34"><span><i class="bname">Aasiya Musalla</i><small>Admin console</small></span></a>
     <h1>Welcome back</h1>
     <p>Sign in to manage the iqamah schedule and announcements shown on the website and the TV display.</p>
     <form id="loginForm" autocomplete="on">
@@ -34,14 +48,14 @@
     <div class="login-or"><span>Don’t have an account?</span></div>
     <a class="btn btn-wa" id="reqAdmin" target="_blank" rel="noopener" href="#"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 1.8a8.2 8.2 0 1 1-4.2 15.3l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 12 3.8Zm-3.3 4.4c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5 0 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4l-.5-.3-1.8-.9c-.3-.1-.4-.1-.6.1l-.8 1c-.2.2-.3.2-.6.1a6.7 6.7 0 0 1-3.4-3c-.2-.4.3-.4.8-1.4.1-.2 0-.4 0-.5l-.8-2c-.2-.5-.4-.4-.6-.4h-.7Z"/></svg>Request an admin account</a>
     <button class="theme-btn login-theme" id="themeBtnLogin" type="button" aria-label="Toggle dark mode">☾</button>
-          <a class="back" href="index.html">← Back to website</a>
+          <a class="back" href="admin.html" id="loginBackChooser">← Choose a different mosque</a>
   </div>
 </div>
 
 <!-- loading overlay -->
 <div class="loader" id="loader" hidden>
   <div class="loader-card">
-    <div class="ring"><img src="assets/mark.png" alt="" width="40" height="31"></div>
+    <div class="ring"><img src="assets/mark.png" alt="" width="40" height="31" id="loaderImg"></div>
     <div class="loader-txt" id="loaderTxt">Fetching your data…</div>
     <div class="loader-bar"><i id="loaderBar"></i></div>
   </div>
@@ -50,7 +64,7 @@
 <!-- ================= CONSOLE ================= -->
 <div class="console" id="console" hidden>
   <aside class="side">
-    <a class="brand" href="index.html"><img src="assets/mark.png" alt="" width="44" height="34"><span>Aasiya Musalla<small>Admin</small></span></a>
+    <a class="brand" href="index.html" id="sideBrand"><img src="assets/mark.png" alt="" width="44" height="34"><span><i class="bname">Aasiya Musalla</i><small>Admin</small></span></a>
     <nav class="sidenav">
       <a href="#overview" data-view="overview" class="active"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></i><span class="nl">Overview</span><span class="ns">Overview</span></a>
       <a href="#iqamah" data-view="iqamah"><i class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></i><span class="nl">Iqamah schedule</span><span class="ns">Iqamah</span></a>
@@ -314,9 +328,11 @@
           <ul class="ulist" id="usersList"><li class="muted">Loading…</li></ul>
           <div class="panel-h grand-only" style="margin-top:18px"><h2>Add an admin</h2><span class="hint">grand admin only</span></div>
           <p class="sub not-grand" id="notGrandNote" hidden>Only the grand admin can add or remove admins. Ask them if someone else needs access.</p>
+          <p class="sub grand-only">Each account belongs to one mosque and can only sign in on that mosque’s login page.</p>
           <div class="ufrm grand-only">
             <input id="nuEmail" type="email" placeholder="email@example.com" autocomplete="off">
             <input id="nuPass" type="text" placeholder="password (8+ characters)" autocomplete="off">
+            <select id="nuRealm" title="Which dashboard this account can sign in to"><option value="aasiya">Aasiya Musalla</option><option value="iaos">IAOS Regina</option><option value="grand">Grand Admin</option></select>
             <button class="btn btn-gold" id="nuAdd" type="button">Add user</button>
           </div>
         </div>
@@ -357,6 +373,27 @@ window.captchaReady=function(){ try{ captchaId=grecaptcha.render("captcha",{site
 function captchaOK(){ if(window.__noCaptcha) return true; if(typeof grecaptcha==="undefined"||captchaId===null) return navigator.onLine===false; return !!grecaptcha.getResponse(captchaId); }
 function captchaReset(){ try{ grecaptcha.reset(captchaId); }catch(e){} }
 const SESSION_KEY="aasiya.admin.session";
+/* ---- Mosque realms: every login page / dashboard / account belongs to exactly one ---- */
+const REALMS={
+  aasiya:{name:"Aasiya Musalla",sub:"Admin console",side:"Admin",img:"assets/mark.png",fav:"assets/favicon.png",title:"Admin — Aasiya Musalla",tv:"prayerdisplay.html",who:"Aasiya Musalla · Regina, SK"},
+  iaos:{name:"IAOS Regina",sub:"Admin console",side:"Admin",img:"assets/iaos-logo-white.png",fav:"assets/iaos-fav.png",title:"Admin — IAOS Regina",tv:"iaosdisplay.html",who:"IAOS Regina · Regina, SK"},
+  grand:{name:"Grand Admin",sub:"All mosques",side:"All mosques",img:"assets/grand.png",fav:"assets/grand.png",title:"Grand Admin — Prayer displays",tv:"prayerdisplay.html",who:"Grand Admin · every mosque"}
+};
+function realmParam(){ const m=(new URLSearchParams(location.search).get("mosque")||"").toLowerCase(); return REALMS[m]?m:""; }
+let REALM=realmParam();
+function applyRealm(r){
+  REALM=r; const R=REALMS[r]; document.body.dataset.realm=r; document.title=R.title;
+  document.querySelectorAll("#loginBrand img,#sideBrand img,#loaderImg").forEach(i=>i.src=R.img);
+  document.querySelectorAll("#loginBrand .bname,#sideBrand .bname").forEach(e=>e.textContent=R.name);
+  document.querySelector("#loginBrand small").textContent=R.sub; document.querySelector("#sideBrand small").textContent=R.side;
+  const f=document.getElementById("favPng"); if(f) f.href=R.fav; const ico=document.querySelector('link[rel="icon"][sizes]'); if(ico) ico.href=R.fav;
+  const tv=document.querySelector(".tvlink"); if(tv) tv.href=R.tv; const vs=document.getElementById("viewSub"); if(vs) vs.textContent=R.who;
+  document.querySelector("#loginForm + .login-or, .login-or").hidden=(r==="grand");   // nobody "requests" a grand account
+  document.getElementById("reqAdmin").hidden=(r==="grand");
+  try{ history.replaceState(null,"",location.pathname+"?mosque="+r+location.hash); }catch(e){}
+}
+function showChooser(){ $("chooser").hidden=false; $("loginScreen").hidden=true; document.title="Admin — choose a mosque"; }
+function showLogin(){ $("chooser").hidden=true; $("loginScreen").hidden=false; }
 
 /* ---- Write endpoint (Google Apps Script web app; see SETUP.md Part 5) ---- */
 const WRITE_URL="https://script.google.com/macros/s/AKfycbx3pdGH5ibD_LjZMaxCjQxDH5fQMkTqsLqMixiL6Vpem5-p6BJaQQqsDMHV1Eg-TVmF/exec";
@@ -373,7 +410,7 @@ const todayKey=()=>{const n=A.mosqueNow();return n.y+"-"+A.pad2(n.m)+"-"+A.pad2(
 const fmtIq=iq=>iq.hours!=null?A.fmtTime(iq.hours):(iq.text||"—");
 
 const REMEMBER_KEY="aasiya.admin.remember";
-function readSess(store){ try{ const s=JSON.parse(store.getItem(SESSION_KEY)||"null"); return s&&s.token&&s.email&&s.exp>Date.now()?s:null; }catch(e){return null;} }
+function readSess(store){ try{ const s=JSON.parse(store.getItem(SESSION_KEY)||"null"); return s&&s.token&&s.email&&s.exp>Date.now()&&REALMS[s.realm]?s:null; }catch(e){return null;} }
 function session(){ return readSess(sessionStorage)||readSess(localStorage); }
 function clearSession(){ sessionStorage.removeItem(SESSION_KEY); localStorage.removeItem(SESSION_KEY); }
 (function(){ try{ if(localStorage.getItem(REMEMBER_KEY)==="1"){ $("remember").checked=true; $("email").value=localStorage.getItem(REMEMBER_KEY+".email")||""; } }catch(e){} })();
@@ -383,9 +420,9 @@ $("pwToggle").onclick=()=>{ const p=$("pass"); const show=p.type==="password"; p
 let PENDING_PW=null;   // grand password kept in memory (never stored) after an offline sign-in, so the session can be upgraded silently
 async function upgradeGrandSession(){
   const s=session(); if(!s||!s.grand||!PENDING_PW) return false;
-  try{ const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"login",email:GRAND_EMAIL,password:PENDING_PW.pass,remember:PENDING_PW.remember})});
+  try{ const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"login",email:GRAND_EMAIL,password:PENDING_PW.pass,remember:PENDING_PW.remember,realm:"grand"})});
     const j=JSON.parse(await r.text()); if(!j.ok||!j.token) return false;
-    const store=PENDING_PW.remember?localStorage:sessionStorage; store.setItem(SESSION_KEY,JSON.stringify({email:GRAND_EMAIL,token:j.token,exp:j.exp,grand:true})); PENDING_PW=null; return true;
+    const store=PENDING_PW.remember?localStorage:sessionStorage; store.setItem(SESSION_KEY,JSON.stringify({email:GRAND_EMAIL,token:j.token,exp:j.exp,grand:true,realm:"grand"})); PENDING_PW=null; return true;
   }catch(e){ return false; }
 }
 /* ---- Loader overlay ---- */
@@ -406,15 +443,17 @@ $("loginForm").addEventListener("submit",async e=>{
   const captcha=(typeof grecaptcha!=="undefined"&&captchaId!==null)?grecaptcha.getResponse(captchaId):"";
   loader("Fetching your data…",5);
   const t0=Date.now();
-  const grand=await isGrand(email,pass);
+  const grand=(await isGrand(email,pass)) && REALM==="grand";
   let res;
-  try{
-    const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"login",email,password:pass,remember,captcha})});
+  if(email===GRAND_EMAIL && REALM!=="grand"){ res={ok:false,error:"The grand admin signs in on the Grand Admin page, not here."}; }
+  else try{
+    const r=await fetch(WRITE_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"login",email,password:pass,remember,captcha,realm:REALM})});
     const txt=await r.text(); try{ res=JSON.parse(txt); }catch(err){ res={ok:false,serverDown:true,error:/Script function not found/i.test(txt)?"The Apps Script needs to be redeployed (v4).":"Login service unavailable ("+r.status+")"}; }
-    if(res.ok&&!res.token) res={ok:false,serverDown:true,error:"The Apps Script is an old version — paste AppsScript.gs v4 and deploy a New version."};
+    if(res.ok&&!res.token) res={ok:false,serverDown:true,error:"The Apps Script is an old version — paste AppsScript.gs v5 and deploy a New version."};
+    if(res.ok&&res.token&&!res.realm){ if(email===GRAND_EMAIL) res.realm="grand"; else res={ok:false,error:"The Apps Script is an old version (v4) — paste AppsScript.gs v5 and deploy a New version so accounts can be kept per mosque."}; }
     if(!res.ok&&/Unknown action/i.test(res.error||"")) res.serverDown=true;   // v3 script has no login action
   }catch(err){ res={ok:false,serverDown:true,error:"Can’t reach the login service — check your connection."}; }
-  if(!res.ok && email===GRAND_EMAIL && !/attempts|locked/i.test(res.error||"")) res.error="Incorrect email or password.";
+  if(!res.ok && email===GRAND_EMAIL && REALM==="grand" && !/attempts|locked/i.test(res.error||"")) res.error="Incorrect email or password.";
   if(grand && !res.ok && res.serverDown){ res={ok:true,email:GRAND_EMAIL,token:"grand",exp:Date.now()+(remember?30*24:8)*3600*1000,local:true}; PENDING_PW={pass,remember}; } // grand admin always gets in
   await sleep(Math.max(0,5000-(Date.now()-t0)));      // always show the loader for 5 s
   if(!res.ok){
@@ -422,7 +461,7 @@ $("loginForm").addEventListener("submit",async e=>{
     $("pass").select(); $("loginBtn").disabled=false; captchaReset(); return;
   }
   clearSession();
-  const sess={email:res.email||email,token:res.token,exp:res.exp||Date.now()+8*3600*1000,grand:grand};
+  const sess={email:res.email||email,token:res.token,exp:res.exp||Date.now()+8*3600*1000,grand:grand||(res.realm==="grand"),realm:REALM};
   if(remember){ localStorage.setItem(SESSION_KEY,JSON.stringify(sess)); localStorage.setItem(REMEMBER_KEY,"1"); localStorage.setItem(REMEMBER_KEY+".email",sess.email); }
   else{ sessionStorage.setItem(SESSION_KEY,JSON.stringify(sess)); localStorage.removeItem(REMEMBER_KEY); }
   $("pass").value="";
@@ -472,16 +511,18 @@ const TITLES={overview:"Overview",iqamah:"Iqamah schedule",announcements:"Announ
 /* ---- Admin users ---- */
 async function loadUsers(){
   const ul=$("usersList");
-  const me=(session()||{}).email, iAmGrand=(me===GRAND_EMAIL);
+  const me=(session()||{}).email, iAmGrand=(me===GRAND_EMAIL)||((session()||{}).realm==="grand");
   document.querySelectorAll(".grand-only").forEach(el=>el.hidden=!iAmGrand); $("notGrandNote").hidden=iAmGrand;
+  { const o=$("nuRealm").querySelector('option[value="grand"]'); if(o) o.hidden=o.disabled=(me!==GRAND_EMAIL); if(me!==GRAND_EMAIL&&$("nuRealm").value==="grand") $("nuRealm").value="aasiya"; }
   try{ const j=await write("users_list");
-    ul.innerHTML=(j.users||[]).map(u=>'<li><span><b>'+esc(u.email)+'</b>'+(u.email===GRAND_EMAIL?' <em>grand admin</em>':u.email===me?' <em>you</em>':'')+(u.created?'<small>added '+esc(String(u.created).slice(0,10))+'</small>':'')+'</span>'+(u.email===me||u.email===GRAND_EMAIL||!iAmGrand?'':'<button class="btn btn-ghost btn-sm" data-del="'+esc(u.email)+'">Remove</button>')+'</li>').join("")||'<li class="muted">No users</li>';
+    const RN={aasiya:"Aasiya",iaos:"IAOS",grand:"Grand"};
+    ul.innerHTML=(j.users||[]).map(u=>'<li><span><b>'+esc(u.email)+'</b>'+(u.realm?' <em class="rb rb-'+esc(u.realm)+'">'+RN[u.realm]+'</em>':'')+(u.email===GRAND_EMAIL?' <em>grand admin</em>':u.email===me?' <em>you</em>':'')+(u.created?'<small>added '+esc(String(u.created).slice(0,10))+'</small>':'')+'</span>'+(u.email===me||u.email===GRAND_EMAIL||!iAmGrand?'':'<button class="btn btn-ghost btn-sm" data-del="'+esc(u.email)+'">Remove</button>')+'</li>').join("")||'<li class="muted">No users</li>';
     ul.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{ if(!confirm("Remove "+b.dataset.del+"? They will be signed out immediately.")) return; try{ await write("user_del",{email:b.dataset.del}); toast("User removed","ok"); loadUsers(); }catch(e){ toast(e.message,"bad"); } });
   }catch(e){ ul.innerHTML='<li class="muted">'+esc(e.message)+'</li>'; }
 }
 $("nuAdd").onclick=async()=>{ const email=$("nuEmail").value.trim(), password=$("nuPass").value;
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return toast("Enter a valid email","bad"); if(password.length<8) return toast("Password must be at least 8 characters","bad");
-  $("nuAdd").disabled=true; try{ await write("user_add",{email,password}); toast("Admin added — share the password with them privately","ok"); $("nuEmail").value=$("nuPass").value=""; loadUsers(); }catch(e){ toast(e.message,"bad"); } $("nuAdd").disabled=false; };
+  $("nuAdd").disabled=true; try{ await write("user_add",{email,password,realm:$("nuRealm").value}); toast("Admin added — share the password with them privately","ok"); $("nuEmail").value=$("nuPass").value=""; loadUsers(); }catch(e){ toast(e.message,"bad"); } $("nuAdd").disabled=false; };
 $("logoutAll").onclick=async()=>{ if(!confirm("Sign out every device, including this one?")) return; try{ await write("logout_all"); clearSession(); location.reload(); }catch(e){ toast(e.message,"bad"); } };
 $("cpSave").onclick=async()=>{ const cur=$("cpCur").value, n1=$("cpNew").value, n2=$("cpNew2").value;
   if(n1.length<8) return toast("New password must be at least 8 characters","bad"); if(n1!==n2) return toast("New passwords don’t match","bad");
@@ -786,7 +827,10 @@ $("pvOrient").onclick=e=>{ const b=e.target.closest("button"); if(!b) return; $(
 
 /* ---- Boot ---- */
 function boot(email){
-  $("loginScreen").hidden=true; $("console").hidden=false; document.body.classList.add("in");
+  const s0=session(); if(s0&&s0.realm) applyRealm(s0.realm);
+  if(REALM!=="grand"){ A.setBoard(REALM); try{ localStorage.setItem("aasiya.admin.board",REALM); }catch(e){} paintBoard(); }
+  $("boardSeg").hidden=(REALM!=="grand");
+  $("chooser").hidden=true; $("loginScreen").hidden=true; $("console").hidden=false; document.body.classList.add("in");
   $("who").textContent=email;
   $("sheetLink").href=$("sheetLink2").href="https://docs.google.com/spreadsheets/d/"+A.SHEET_ID+"/edit";
   showView(location.hash.slice(1));
@@ -794,7 +838,10 @@ function boot(email){
   setInterval(tickOverview,1000); setInterval(()=>{ if(!DIRTY&&!SET_DIRTY&&EDIT===null) loadAll(); },5*60*1000);
   window.addEventListener("beforeunload",e=>{ if(DIRTY||SET_DIRTY){ e.preventDefault(); e.returnValue=""; } });
 }
-const s=session(); if(s){ boot(s.email); if(!s.grand) write("whoami").catch(()=>{}); } else $("email").focus();
+const s=session();
+if(s){ boot(s.email); if(!s.grand) write("whoami").catch(()=>{}); }
+else if(REALM){ applyRealm(REALM); showLogin(); $("email").focus(); }
+else showChooser();
 })();
 
 (function(){
@@ -805,5 +852,5 @@ const s=session(); if(s){ boot(s.email); if(!s.grand) write("whoami").catch(()=>
   document.querySelectorAll("#themeBtn,#themeBtnLogin").forEach(b=>b.onclick=flip);
 })();
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3ab67eed82b5d34',t:'MTc4OTM0NzExNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3f5f7f8fc2ceef3',t:'MTc5MDEyODk2MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
