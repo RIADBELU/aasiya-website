@@ -641,3 +641,40 @@ body[data-board="iaos"] .board-seg button.on{background:var(--green-2);color:#ff
 .slopts .slopt{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;margin:0;text-transform:none}
 .slopts .slopt input[type=number]{width:80px}
 .slopts .msg{flex:1;text-align:right}
+
+/* ---- Multi-mosque admin v10: chooser, realm branding ---- */
+.chooser[hidden]{display:none!important}
+.chooser{min-height:100vh;display:grid;place-items:center;padding:32px 20px;background:radial-gradient(1200px 500px at 80% -10%,rgba(226,197,111,.14),transparent 60%),linear-gradient(180deg,#0b2e2a,#0F3D38 60%,#0d3531)}
+.chooser-card{width:min(940px,100%);text-align:center;color:#fff}
+.chooser-card h1{font-size:clamp(26px,4vw,40px);letter-spacing:-.02em;margin:0 0 10px;color:#fff}
+.chooser-card p{opacity:.72;margin:0 0 34px;font-size:16px}
+.chooser-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:760px){.chooser-grid{grid-template-columns:1fr}}
+.ch{display:flex;flex-direction:column;align-items:center;gap:8px;padding:34px 22px 28px;border-radius:22px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#fff;text-decoration:none;transition:.2s;box-shadow:var(--sh-2)}
+.ch:hover{transform:translateY(-3px);background:rgba(255,255,255,.1);border-color:rgba(226,197,111,.55)}
+.ch img{width:76px;height:76px;object-fit:contain;border-radius:18px;padding:12px;box-sizing:border-box;background:rgba(255,255,255,.08);margin-bottom:8px}
+.ch-iaos img{background:#0d5c4f}
+.ch-grand img{padding:0;background:transparent}
+.ch b{font-size:19px;letter-spacing:-.01em}
+.ch small{opacity:.65;font-size:12.5px;letter-spacing:.04em}
+.chooser .back{display:inline-block;margin-top:30px;color:#fff;opacity:.7;text-decoration:none;font-size:14px}
+.chooser .back:hover{opacity:1}
+/* IAOS realm */
+body[data-realm="iaos"] .login-panel .brand img,body[data-realm="iaos"] .loader .ring img{background:#0d5c4f;border-radius:10px;padding:4px;box-sizing:border-box}
+body[data-realm="iaos"] .side{background:linear-gradient(180deg,#083f36 0%,#0d5c4f 60%,#0a4a40 100%)}
+body[data-realm="iaos"] .login-art{background:#083f36 url("assets/iaos-banner.jpg") center/cover no-repeat}
+body[data-realm="iaos"] .login-art::before{background:linear-gradient(160deg,rgba(8,63,54,.78),rgba(13,92,79,.45) 60%,rgba(8,63,54,.8))}
+/* Grand realm */
+body[data-realm="grand"] .side{background:linear-gradient(180deg,#141414 0%,#232323 60%,#1a1a1a 100%);box-shadow:inset -1px 0 0 rgba(226,197,111,.28)}
+body[data-realm="grand"] .side .brand img{background:transparent;border:0;padding:0;border-radius:50%}
+body[data-realm="grand"] .side .brand small{color:#E2C56F;opacity:.9}
+body[data-realm="grand"] .login-art{background:linear-gradient(160deg,#1a1a1a,#3a3117)}
+body[data-realm="grand"] .login-panel .brand img,body[data-realm="grand"] .loader .ring img{border-radius:50%}
+/* realm badge in users list */
+.ulist em.rb{font-style:normal;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:999px;background:rgba(15,61,56,.1);color:#0F3D38;margin-left:6px}
+.ulist em.rb-iaos{background:rgba(13,92,79,.14);color:#0d5c4f}
+.ulist em.rb-grand{background:rgba(226,197,111,.28);color:#5a4a12}
+html[data-theme="dark"] .ulist em.rb{background:rgba(255,255,255,.1);color:var(--ink)}
+.ufrm select{padding:10px 12px;border:1px solid var(--line,#d9ded9);border-radius:10px;background:#fff;font:inherit}
+html[data-theme="dark"] .ufrm select{background:#111c19;color:var(--ink);border-color:rgba(255,255,255,.14)}
+#boardSeg[hidden]{display:none!important}
